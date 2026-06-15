@@ -4,6 +4,7 @@
 > **Plats:** `~/ai_upscale_work/CLAUDE.md`
 > Identitet, kärnprinciper, ADHD-regler → `~/.claude/CLAUDE.md`
 > Skill-karta → `~/.claude/SKILLS_INDEX.md`
+> **Context-moduler & agenter (egna mappar, länkade till projekt) → `REGISTRY.md`** · projekt → `PROJECTS_REGISTRY.md`
 
 ---
 
