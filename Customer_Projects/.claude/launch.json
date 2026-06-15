@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vagvisaren",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd Arbetsformedlingen && ./node_modules/.bin/next dev -p 3848"],
+      "port": 3848
+    },
+    {
+      "name": "ze-parts",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd ze-parts && ./node_modules/.bin/vite --port 5173 --host"],
+      "port": 5173
+    },
+    {
+      "name": "byggflow",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd ByggFlow && ./node_modules/.bin/vite --port 5174 --host"],
+      "port": 5174
+    },
+    {
+      "name": "infrea",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd Infrea-Insight && ./node_modules/.bin/vite --port 5175 --host"],
+      "port": 5175
+    },
+    {
+      "name": "trading-dashboard",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd mikael-trading-os && python3 -m http.server 5180"],
+      "port": 5180
+    }
+  ]
+}

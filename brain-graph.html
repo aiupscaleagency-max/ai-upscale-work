@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<title>AI Upscale Brain — Memory Galaxy</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#020208; color:#e2e8f0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; overflow:hidden; height:100vh; }
+#canvas { width:100vw; height:100vh; }
+
+/* HUD */
+#hud { position:fixed; top:16px; left:16px; z-index:10; display:flex; flex-direction:column; gap:8px; }
+#brand { font-size:11px; color:#4a5568; letter-spacing:2px; text-transform:uppercase; }
+#galaxy-title { font-size:22px; font-weight:700; color:#fff; text-shadow:0 0 30px rgba(200,180,255,0.5); }
+#galaxy-sub { font-size:11px; color:#4a5568; margin-top:2px; }
+#counter { font-size:11px; color:#6b7280; margin-top:4px; }
+#search {
+  background:rgba(10,10,25,0.8); border:1px solid #1a1a3a;
+  border-radius:6px; color:#e2e8f0; padding:5px 10px;
+  font-size:11px; width:200px; outline:none; margin-top:4px;
+}
+#search:focus { border-color:rgba(180,160,255,0.5); }
+#legend { margin-top:6px; display:flex; flex-direction:column; gap:3px; }
+.leg { font-size:10px; color:#4a5568; display:flex; align-items:center; gap:5px; }
+.leg-dot { width:6px; height:6px; border-radius:50%; }
+
+/* Info-panel */
+#panel {
+  position:fixed; right:0; top:0; bottom:0; width:270px;
+  background:rgba(5,5,15,0.95); border-left:1px solid #0f0f2a;
+  padding:20px 14px; transform:translateX(100%);
+  transition:transform 0.2s ease; z-index:20; overflow-y:auto;
+}
+#panel.open { transform:translateX(0); }
+#panel-title { font-size:15px; font-weight:700; margin-bottom:4px; }
+#panel-cat { font-size:10px; color:#6b7280; margin-bottom:4px; }
+#panel-recency { font-size:10px; margin-bottom:10px; }
+#panel-path { font-size:9px; color:#374151; word-break:break-all; margin-bottom:12px; }
+#panel-links h3 { font-size:9px; color:#4b5563; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.plink { font-size:10px; color:#6b7280; padding:3px 0 3px 7px; cursor:pointer; border-left:1px solid transparent; }
+.plink:hover { color:#e2e8f0; }
+#close-btn { position:absolute; top:10px; right:10px; background:none; border:none; color:#374151; font-size:16px; cursor:pointer; }
+#close-btn:hover { color:#e2e8f0; }
+
+/* Live-indikator */
+#live { position:fixed; bottom:16px; right:16px; font-size:10px; color:#374151; display:flex; align-items:center; gap:5px; }
+#live-dot { width:5px; height:5px; border-radius:50%; background:#10b981; animation:blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
+</style>
+</head>
+<body>
+<svg id="canvas">
+  <defs>
+    <filter id="glow-sm"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-md"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-lg"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+</svg>
+
+<div id="hud">
+  <div id="brand">LOCAL · STUDIO</div>
+  <div>
+    <div id="galaxy-title">Memory</div>
+    <div id="galaxy-sub">AI Upscale Brain — Obsidian Vault</div>
+  </div>
+  <div id="counter">63 stjärnor · 36 kopplingar</div>
+  <input id="search" type="text" placeholder="Sök stjärna..." autocomplete="off"/>
+  <div id="legend">
+    <div class="leg"><span class="leg-dot" style="background:rgb(255,240,180)"></span>hub</div>
+    <div class="leg"><span class="leg-dot" style="background:rgb(180,255,220)"></span>projekt</div>
+    <div class="leg"><span class="leg-dot" style="background:rgb(210,180,255)"></span>memory</div>
+    <div class="leg"><span class="leg-dot" style="background:rgb(150,230,255)"></span>feedback</div>
+    <div class="leg"><span class="leg-dot" style="background:rgb(255,200,150)"></span>agent</div>
+    <div class="leg"><span class="leg-dot" style="background:rgb(180,210,255)"></span>strategi</div>
+    <div class="leg" style="margin-top:4px;color:#374151">ljusare = nyligen rörd</div>
+  </div>
+</div>
+
+<div id="panel">
+  <button id="close-btn" onclick="closePanel()">✕</button>
+  <div id="panel-title"></div>
+  <div id="panel-cat"></div>
+  <div id="panel-recency"></div>
+  <div id="panel-path"></div>
+  <div id="panel-links"></div>
+</div>
+
+<div id="live"><div id="live-dot"></div><span id="live-text">Ansluten</span></div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const DATA = {"nodes": [{"id": "00-INDEX.md", "title": "AI Upscale Brain — 2nd Brain", "category": "hub", "r": 255, "g": 240, "b": 180, "recency": 0.994, "words": 192, "path": "00-INDEX.md", "degree": 17}, {"id": "03-agents/INDEX.md", "title": "03-agents — Agent Registry & Skills", "category": "agent", "r": 255, "g": 200, "b": 150, "recency": 0.994, "words": 69, "path": "03-agents/INDEX.md", "degree": 4}, {"id": "03-agents/AGENTS_REGISTRY.md", "title": "AGENTS & SKILLS REGISTRY — AI Upscale Agency", "category": "agent", "r": 255, "g": 200, "b": 150, "recency": 0.87, "words": 1243, "path": "03-agents/AGENTS_REGISTRY.md", "degree": 1}, {"id": "03-agents/skills/INDEX.md", "title": "Skills Index — 70+ Claude Code Skills", "category": "agent", "r": 255, "g": 200, "b": 150, "recency": 0.994, "words": 780, "path": "03-agents/skills/INDEX.md", "degree": 0}, {"id": "08-memory/project_the_engine.md", "title": "The Engine — Agentic OS", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.732, "words": 487, "path": "08-memory/project_the_engine.md", "degree": 0}, {"id": "08-memory/feedback_always_commit.md", "title": "Alltid committa och pusha ändringar", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.194, "words": 122, "path": "08-memory/feedback_always_commit.md", "degree": 0}, {"id": "08-memory/feedback_channels_per_product.md", "title": "Säljkanaler per produkt — LinkedIn vs FB/TikTok", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.659, "words": 213, "path": "08-memory/feedback_channels_per_product.md", "degree": 0}, {"id": "08-memory/project_paperclip_content_teams.md", "title": "Content & Media Factory (koncept, ej aktuellt att bygga)", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.576, "words": 211, "path": "08-memory/project_paperclip_content_teams.md", "degree": 0}, {"id": "08-memory/feedback_prefer_fewer_bigger_clients.md", "title": "Föredrar färre stora kunder, inte många små", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.659, "words": 199, "path": "08-memory/feedback_prefer_fewer_bigger_clients.md", "degree": 0}, {"id": "08-memory/project_eravault.md", "title": "EraVault YouTube-kanal", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.578, "words": 501, "path": "08-memory/project_eravault.md", "degree": 0}, {"id": "08-memory/infra_costs.md", "title": "Infra-kostnader för Mike (verifierat 2026-05-14)", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.613, "words": 213, "path": "08-memory/infra_costs.md", "degree": 0}, {"id": "08-memory/feedback_agent_validation_before_build.md", "title": "agenter-ska-validera-innan-vi-bygger", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.993, "words": 184, "path": "08-memory/feedback_agent_validation_before_build.md", "degree": 0}, {"id": "08-memory/skills_new_2026_05_17.md", "title": "Nya skills installerade 2026-05-17", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.659, "words": 238, "path": "08-memory/skills_new_2026_05_17.md", "degree": 0}, {"id": "08-memory/project_fluentic_ai.md", "title": "Fluentic AI — språkapp", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.732, "words": 183, "path": "08-memory/project_fluentic_ai.md", "degree": 1}, {"id": "08-memory/projects_registry.md", "title": "projects-registry-komplett-karta", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.992, "words": 196, "path": "08-memory/projects_registry.md", "degree": 0}, {"id": "08-memory/project_thyroidai.md", "title": "ThyroidAI projekt", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.732, "words": 588, "path": "08-memory/project_thyroidai.md", "degree": 1}, {"id": "08-memory/project_vercel_stripe.md", "title": "Vercel-hack — byt Stripe-keys före monetisering", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.506, "words": 185, "path": "08-memory/project_vercel_stripe.md", "degree": 0}, {"id": "08-memory/pricing_floors.md", "title": "Pris-golv per produkt/bransch", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.659, "words": 240, "path": "08-memory/pricing_floors.md", "degree": 0}, {"id": "08-memory/project_cluee_news_customer.md", "title": "Cluee News som kund", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.254, "words": 81, "path": "08-memory/project_cluee_news_customer.md", "degree": 0}, {"id": "08-memory/feedback_listen_first.md", "title": "Lyssna FÖRST på Mike — han upprepar inte gärna", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.649, "words": 282, "path": "08-memory/feedback_listen_first.md", "degree": 0}, {"id": "08-memory/MEMORY.md", "title": "AIOS Memory Index", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 1.0, "words": 503, "path": "08-memory/MEMORY.md", "degree": 1}, {"id": "08-memory/infra_openclaw.md", "title": "infra-openclaw", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.881, "words": 95, "path": "08-memory/infra_openclaw.md", "degree": 0}, {"id": "08-memory/feedback_llm_costs.md", "title": "LLM-kostnad och modellval", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.203, "words": 118, "path": "08-memory/feedback_llm_costs.md", "degree": 0}, {"id": "08-memory/feedback_remotion_iteration.md", "title": "Remotion-iterationer — leverera snabbt, ingen över-engineering", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.66, "words": 177, "path": "08-memory/feedback_remotion_iteration.md", "degree": 0}, {"id": "08-memory/skills_agents_registry.md", "title": "skills-agents-registry", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.87, "words": 191, "path": "08-memory/skills_agents_registry.md", "degree": 2}, {"id": "08-memory/feedback_speech_over_text.md", "title": "Talad kommunikation går före textperfektion (Fluentic AI)", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.51, "words": 263, "path": "08-memory/feedback_speech_over_text.md", "degree": 0}, {"id": "08-memory/project_master2.md", "title": "AI Upscale Master 3.0 — Docker + OpenClaw + Claude Code", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.732, "words": 205, "path": "08-memory/project_master2.md", "degree": 0}, {"id": "08-memory/project_ceo_adhd.md", "title": "CEO with ADHD projekt", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.203, "words": 133, "path": "08-memory/project_ceo_adhd.md", "degree": 0}, {"id": "08-memory/strategy_llm_tiering.md", "title": "LLM-tiering — Mike vs OpenClaw-agenter", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.602, "words": 184, "path": "08-memory/strategy_llm_tiering.md", "degree": 1}, {"id": "08-memory/mike_drivers.md", "title": "Mikes drivers — varför han bygger AIOS", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.921, "words": 235, "path": "08-memory/mike_drivers.md", "degree": 0}, {"id": "08-memory/project_extra_computer.md", "title": "Extra dator — för The Engine + parallella agenter", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.602, "words": 173, "path": "08-memory/project_extra_computer.md", "degree": 0}, {"id": "08-memory/project_thyroid_sprint_2026_05.md", "title": "ThyroidAI 7-dagars sprint (2026-05-17)", "category": "memory", "r": 210, "g": 180, "b": 255, "recency": 0.659, "words": 256, "path": "08-memory/project_thyroid_sprint_2026_05.md", "degree": 0}, {"id": "08-memory/feedback_video_bottleneck.md", "title": "Video är tvärgående flaskhals för ALLA projekt", "category": "feedback", "r": 150, "g": 230, "b": 255, "recency": 0.659, "words": 217, "path": "08-memory/feedback_video_bottleneck.md", "degree": 0}, {"id": "01-strategy/claude-md/project-CLAUDE.md", "title": "AI Upscale Agency — Projekt-kontext (WHAT)", "category": "strategy", "r": 180, "g": 210, "b": 255, "recency": 0.921, "words": 1284, "path": "01-strategy/claude-md/project-CLAUDE.md", "degree": 0}, {"id": "01-strategy/claude-md/global-CLAUDE.md", "title": "Mike — Global Claude-konfiguration", "category": "strategy", "r": 180, "g": 210, "b": 255, "recency": 0.921, "words": 875, "path": "01-strategy/claude-md/global-CLAUDE.md", "degree": 2}, {"id": "04-projects/PROJECTS_REGISTRY.md", "title": "PROJECTS_REGISTRY — komplett karta över alla projekt", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.992, "words": 746, "path": "04-projects/PROJECTS_REGISTRY.md", "degree": 0}, {"id": "04-projects/INDEX.md", "title": "Projekt-översikt — 13 aktiva projekt", "category": "hub", "r": 255, "g": 240, "b": 180, "recency": 0.994, "words": 184, "path": "04-projects/INDEX.md", "degree": 14}, {"id": "04-projects/aios-core-landing/README.md", "title": "AIOS Core Landing — AI Upscale Agency", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.726, "words": 154, "path": "04-projects/aios-core-landing/README.md", "degree": 2}, {"id": "04-projects/aios-core-landing/CLAUDE.md", "title": "AIOS Landing — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.667, "words": 109, "path": "04-projects/aios-core-landing/CLAUDE.md", "degree": 0}, {"id": "04-projects/ceo-with-adhd/README.md", "title": "CEO with ADHD", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.578, "words": 742, "path": "04-projects/ceo-with-adhd/README.md", "degree": 2}, {"id": "04-projects/ceo-with-adhd/CLAUDE.md", "title": "CEO with ADHD — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.87, "words": 317, "path": "04-projects/ceo-with-adhd/CLAUDE.md", "degree": 0}, {"id": "04-projects/thyroidai/README.md", "title": "or", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.0, "words": 155, "path": "04-projects/thyroidai/README.md", "degree": 3}, {"id": "04-projects/thyroidai/CLAUDE.md", "title": "ThyroidAI Clinic — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.87, "words": 395, "path": "04-projects/thyroidai/CLAUDE.md", "degree": 0}, {"id": "04-projects/ze-parts/README.md", "title": "Ze-Parts — AIOS för fordonsdelar", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.994, "words": 93, "path": "04-projects/ze-parts/README.md", "degree": 2}, {"id": "04-projects/ze-parts/CLAUDE.md", "title": "Ze-Parts — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.871, "words": 239, "path": "04-projects/ze-parts/CLAUDE.md", "degree": 0}, {"id": "04-projects/mikael-trading-os/README.md", "title": "trading-agent", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.41, "words": 829, "path": "04-projects/mikael-trading-os/README.md", "degree": 2}, {"id": "04-projects/mikael-trading-os/CLAUDE.md", "title": "Trading OS — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.69, "words": 109, "path": "04-projects/mikael-trading-os/CLAUDE.md", "degree": 0}, {"id": "04-projects/byggflow/README.md", "title": "ByggFlow", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.407, "words": 101, "path": "04-projects/byggflow/README.md", "degree": 2}, {"id": "04-projects/byggflow/CLAUDE.md", "title": "ByggFlow — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.87, "words": 257, "path": "04-projects/byggflow/CLAUDE.md", "degree": 0}, {"id": "04-projects/caso-chile-dashboard/README.md", "title": "Caso Chile — Familjens AI-team", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.29, "words": 256, "path": "04-projects/caso-chile-dashboard/README.md", "degree": 2}, {"id": "04-projects/caso-chile-dashboard/CLAUDE.md", "title": "Caso Chile — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.667, "words": 109, "path": "04-projects/caso-chile-dashboard/CLAUDE.md", "degree": 0}, {"id": "04-projects/af-sius/README.md", "title": "AF-SIUS — AI-drivet jobbsökar-OS", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.994, "words": 150, "path": "04-projects/af-sius/README.md", "degree": 2}, {"id": "04-projects/af-sius/CLAUDE.md", "title": "AF-SIUS — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.87, "words": 351, "path": "04-projects/af-sius/CLAUDE.md", "degree": 0}, {"id": "04-projects/fluentic-ai/README.md", "title": "Fluentic AI", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.506, "words": 653, "path": "04-projects/fluentic-ai/README.md", "degree": 3}, {"id": "04-projects/fluentic-ai/CLAUDE.md", "title": "Fluentic AI — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.871, "words": 249, "path": "04-projects/fluentic-ai/CLAUDE.md", "degree": 0}, {"id": "04-projects/graphify-mall-ai-os/README.md", "title": "Graphify Mall", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.407, "words": 101, "path": "04-projects/graphify-mall-ai-os/README.md", "degree": 2}, {"id": "04-projects/graphify-mall-ai-os/CLAUDE.md", "title": "Graphify Mall — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.69, "words": 109, "path": "04-projects/graphify-mall-ai-os/CLAUDE.md", "degree": 0}, {"id": "04-projects/aiupscale-monitor/README.md", "title": "AI Upscale Monitor", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.637, "words": 298, "path": "04-projects/aiupscale-monitor/README.md", "degree": 2}, {"id": "04-projects/aiupscale-monitor/CLAUDE.md", "title": "Monitor — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.636, "words": 1, "path": "04-projects/aiupscale-monitor/CLAUDE.md", "degree": 0}, {"id": "04-projects/aios-core/README.md", "title": "AIOS Core — AI Upscale Agency", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.011, "words": 161, "path": "04-projects/aios-core/README.md", "degree": 2}, {"id": "04-projects/aios-core/CLAUDE.md", "title": "AIOS Core — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.871, "words": 328, "path": "04-projects/aios-core/CLAUDE.md", "degree": 0}, {"id": "04-projects/infrea-insight/README.md", "title": "Infrea-Insight", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.407, "words": 101, "path": "04-projects/infrea-insight/README.md", "degree": 2}, {"id": "04-projects/infrea-insight/CLAUDE.md", "title": "Infrea-Insight — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.87, "words": 250, "path": "04-projects/infrea-insight/CLAUDE.md", "degree": 0}], "links": [{"source": "00-INDEX.md", "target": "04-projects/INDEX.md"}, {"source": "00-INDEX.md", "target": "01-strategy/claude-md/global-CLAUDE.md"}, {"source": "00-INDEX.md", "target": "03-agents/INDEX.md"}, {"source": "00-INDEX.md", "target": "08-memory/MEMORY.md"}, {"source": "00-INDEX.md", "target": "04-projects/thyroidai/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/byggflow/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/infrea-insight/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/af-sius/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/fluentic-ai/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/ceo-with-adhd/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/aios-core/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/ze-parts/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/graphify-mall-ai-os/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/aios-core-landing/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/aiupscale-monitor/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/caso-chile-dashboard/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/mikael-trading-os/README.md"}, {"source": "03-agents/INDEX.md", "target": "03-agents/AGENTS_REGISTRY.md"}, {"source": "03-agents/INDEX.md", "target": "01-strategy/claude-md/global-CLAUDE.md"}, {"source": "03-agents/INDEX.md", "target": "08-memory/skills_agents_registry.md"}, {"source": "08-memory/skills_agents_registry.md", "target": "08-memory/strategy_llm_tiering.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aios-core-landing/README.md"}, {"source": "08-memory/project_fluentic_ai.md", "target": "04-projects/fluentic-ai/README.md"}, {"source": "08-memory/project_thyroidai.md", "target": "04-projects/thyroidai/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/ceo-with-adhd/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/thyroidai/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/ze-parts/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/mikael-trading-os/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/byggflow/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/caso-chile-dashboard/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/af-sius/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/fluentic-ai/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/graphify-mall-ai-os/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aiupscale-monitor/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aios-core/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/infrea-insight/README.md"}]};
+const W = () => window.innerWidth, H = () => window.innerHeight;
+
+// Adjacency
+const adj = {};
+DATA.links.forEach(l => {
+  if (!adj[l.source]) adj[l.source] = [];
+  if (!adj[l.target]) adj[l.target] = [];
+  adj[l.source].push(l.target);
+  adj[l.target].push(l.source);
+});
+
+// Nodstorlek: baserat på degree + recency
+function starRadius(d) {
+  const base = d.category === "hub" ? 6 : 2;
+  return base + d.degree * 0.6 + d.recency * 4;
+}
+
+// Stjärnfärg: tint + ljusstyrka baserat på recency
+function starColor(d, alpha) {
+  const brightness = 0.25 + d.recency * 0.75;
+  const r = Math.round(d.r * brightness);
+  const g = Math.round(d.g * brightness);
+  const b = Math.round(d.b * brightness);
+  return alpha !== undefined
+    ? `rgba(${r},${g},${b},${alpha})`
+    : `rgb(${r},${g},${b})`;
+}
+
+function glowFilter(d) {
+  if (d.category === "hub") return "url(#glow-lg)";
+  if (d.recency > 0.7 || d.degree > 3) return "url(#glow-md)";
+  return "url(#glow-sm)";
+}
+
+const svg = d3.select("#canvas");
+const g   = svg.append("g");
+svg.call(d3.zoom().scaleExtent([0.05, 6]).on("zoom", e => g.attr("transform", e.transform)));
+
+// Sprida ut noder initialt som en galax
+DATA.nodes.forEach(n => {
+  const angle = Math.random() * 2 * Math.PI;
+  const dist  = 50 + Math.random() * Math.min(W(), H()) * 0.45;
+  n.x = W()/2 + Math.cos(angle) * dist;
+  n.y = H()/2 + Math.sin(angle) * dist;
+});
+
+const sim = d3.forceSimulation(DATA.nodes)
+  .force("link", d3.forceLink(DATA.links).id(d => d.id).distance(d => {
+    const sc = d.source.category || "", tc = d.target.category || "";
+    if (sc === "hub" || tc === "hub") return 180;
+    return 100;
+  }).strength(0.3))
+  .force("charge", d3.forceManyBody().strength(-300).distanceMax(400))
+  .force("center", d3.forceCenter(W()/2, H()/2).strength(0.04))
+  .force("collide", d3.forceCollide(d => starRadius(d) + 10))
+  .alphaDecay(0.015);
+
+// Kopplingar
+const link = g.append("g").selectAll("line")
+  .data(DATA.links).join("line")
+  .attr("stroke", "rgba(255,255,255,0.06)")
+  .attr("stroke-width", 0.5);
+
+// Stjärnor
+const node = g.append("g").selectAll(".star")
+  .data(DATA.nodes).join("g").attr("class", "star")
+  .call(d3.drag()
+    .on("start", (e,d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on("drag",  (e,d) => { d.fx=e.x; d.fy=e.y; })
+    .on("end",   (e,d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
+  )
+  .on("click", (e,d) => { e.stopPropagation(); selectStar(d); });
+
+node.append("circle")
+  .attr("r", d => starRadius(d))
+  .attr("fill", d => starColor(d))
+  .attr("filter", d => glowFilter(d))
+  .style("cursor", "pointer");
+
+// Labels — bara för hub + högre degree
+node.append("text")
+  .attr("dy", d => starRadius(d) + 11)
+  .attr("text-anchor", "middle")
+  .attr("fill", d => starColor(d, 0.8))
+  .attr("font-size", d => d.category === "hub" ? "11px" : "9px")
+  .style("pointer-events", "none")
+  .style("text-shadow", "0 0 8px #000, 0 0 4px #000")
+  .text(d => {
+    if (d.category === "hub" || d.degree >= 4 || d.recency > 0.8) {
+      return d.title.length > 22 ? d.title.slice(0,20) + "…" : d.title;
+    }
+    return "";
+  });
+
+sim.on("tick", () => {
+  link.attr("x1", d=>d.source.x).attr("y1", d=>d.source.y)
+      .attr("x2", d=>d.target.x).attr("y2", d=>d.target.y);
+  node.attr("transform", d=>`translate(${d.x},${d.y})`);
+});
+
+// --- Interaktion ---
+let orbitRing = null;
+
+function selectStar(d) {
+  const hl = new Set([d.id, ...(adj[d.id]||[])]);
+
+  // Orbit-ring
+  if (orbitRing) orbitRing.remove();
+  orbitRing = g.append("circle")
+    .attr("cx", d.x).attr("cy", d.y)
+    .attr("r", starRadius(d) + 18)
+    .attr("fill", "none")
+    .attr("stroke", starColor(d, 0.4))
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "4 3");
+
+  link.attr("stroke", l => {
+    const s = l.source.id||l.source, t = l.target.id||l.target;
+    return hl.has(s)&&hl.has(t) ? starColor(d, 0.5) : "rgba(255,255,255,0.03)";
+  }).attr("stroke-width", l => {
+    const s = l.source.id||l.source, t = l.target.id||l.target;
+    return hl.has(s)&&hl.has(t) ? 1 : 0.5;
+  });
+  node.select("circle").attr("opacity", n => hl.has(n.id) ? 1 : 0.15);
+  node.select("text").attr("opacity", n => hl.has(n.id) ? 1 : 0.05);
+
+  const panel = document.getElementById("panel");
+  panel.classList.add("open");
+  document.getElementById("panel-title").textContent = d.title;
+  document.getElementById("panel-title").style.color = starColor(d);
+  document.getElementById("panel-cat").textContent = d.category;
+  const pct = Math.round(d.recency * 100);
+  document.getElementById("panel-recency").innerHTML =
+    `<span style="color:${starColor(d)}">★</span> Aktualitet: ${pct}% (ljusare = nyare)`;
+  document.getElementById("panel-path").textContent = d.path;
+
+  const nbrs = adj[d.id]||[];
+  document.getElementById("panel-links").innerHTML = nbrs.length
+    ? `<h3>Kopplingar (${nbrs.length})</h3>` + nbrs.map(nid => {
+        const nd = DATA.nodes.find(n=>n.id===nid);
+        return nd ? `<div class="plink" style="border-left-color:${starColor(nd)}" onclick="selectById('${nid}')">${nd.title}</div>` : "";
+      }).join("")
+    : `<span style="font-size:10px;color:#374151">Inga kopplingar</span>`;
+}
+
+function closePanel() {
+  if (orbitRing) { orbitRing.remove(); orbitRing=null; }
+  document.getElementById("panel").classList.remove("open");
+  link.attr("stroke","rgba(255,255,255,0.06)").attr("stroke-width",0.5);
+  node.select("circle").attr("opacity",1);
+  node.select("text").attr("opacity",1);
+}
+
+function selectById(id) {
+  const nd = DATA.nodes.find(n=>n.id===id);
+  if (nd) selectStar(nd);
+}
+
+svg.on("click", closePanel);
+
+// --- Sök ---
+document.getElementById("search").addEventListener("input", function() {
+  const q = this.value.toLowerCase().trim();
+  node.select("circle").attr("opacity", d => !q || d.title.toLowerCase().includes(q) ? 1 : 0.08);
+  node.select("text").attr("opacity", d => !q || d.title.toLowerCase().includes(q) ? 1 : 0.02);
+  if (!q) link.attr("stroke","rgba(255,255,255,0.06)");
+});
+
+window.addEventListener("resize", () =>
+  sim.force("center", d3.forceCenter(W()/2,H()/2)).alpha(0.1).restart()
+);
+
+// --- Auto-reload via HEAD-polling (fungerar med python -m http.server) ---
+let _lastMod = null;
+async function pollForUpdates() {
+  try {
+    const res = await fetch(window.location.href, {method:'HEAD', cache:'no-store'});
+    const lm  = res.headers.get('Last-Modified') || res.headers.get('ETag') || '';
+    if (_lastMod === null) { _lastMod = lm; }
+    else if (lm !== _lastMod) { window.location.reload(); return; }
+    document.getElementById("live-dot").style.background = "#10b981";
+    document.getElementById("live-text").textContent = "Live";
+  } catch(e) {
+    document.getElementById("live-dot").style.background = "#6b7280";
+    document.getElementById("live-text").textContent = "Offline";
+  }
+}
+pollForUpdates();
+setInterval(pollForUpdates, 15000);
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+# OpenClaw production-stack för AI Upscale Agency
+# Host: 76.13.149.231 (samma VPS som ThyroidAI)
+# Resource limit 2 GB RAM så vi inte stör ThyroidAI
+
+services:
+  openclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: openclaw:custom
+    container_name: openclaw-gateway
+    restart: unless-stopped
+
+    # Resource-limit för säker samexistens med ThyroidAI
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "1.5"
+        reservations:
+          memory: 512M
+
+    # Persistens — all OpenClaw-state lever på host i /var/openclaw/state
+    volumes:
+      - /var/openclaw/state:/root/.openclaw
+
+    # API-keys + bot-token via env. Definieras i .env (NOT in git)
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+      - OPENCLAW_GATEWAY_PORT=18789
+      - NODE_ENV=production
+      - TZ=Europe/Stockholm
+      # Ollama via SSH reverse tunnel från Mac → host:11434
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+
+    # Loopback-binding behålls (säker fallback)
+    ports:
+      - "127.0.0.1:18789:18789"
+
+    # Traefik labels — exponerar dashboard.aiupscale.agency med Let's Encrypt
+    labels:
+      - traefik.enable=true
+      # === Router: dashboard.aiupscale.agency (HTTPS) ===
+      - "traefik.http.routers.openclaw.rule=Host(`dashboard.aiupscale.agency`)"
+      - traefik.http.routers.openclaw.entrypoints=websecure
+      - traefik.http.routers.openclaw.tls.certresolver=letsencrypt
+      - "traefik.http.routers.openclaw.tls.domains[0].main=dashboard.aiupscale.agency"
+      - traefik.http.routers.openclaw.service=openclaw
+      # === HTTP → HTTPS redirect ===
+      - "traefik.http.routers.openclaw-http.rule=Host(`dashboard.aiupscale.agency`)"
+      - traefik.http.routers.openclaw-http.entrypoints=web
+      - traefik.http.routers.openclaw-http.middlewares=openclaw-redirect
+      - traefik.http.middlewares.openclaw-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.openclaw-redirect.redirectscheme.permanent=true
+      # === Service port ===
+      - traefik.http.services.openclaw.loadbalancer.server.port=18789
+
+    # Låt container nå host (för Ollama-tunnel via SSH reverse)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - openclaw_net
+
+networks:
+  openclaw_net:
+    driver: bridge

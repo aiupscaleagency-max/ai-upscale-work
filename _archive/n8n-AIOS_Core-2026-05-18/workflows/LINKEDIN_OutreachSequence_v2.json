@@ -1,0 +1,381 @@
+{
+    "name": "LINKEDIN_OutreachSequence_v2",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 8 * * 1-5"
+                        }
+                    ]
+                }
+            },
+            "id": "trigger-schedule",
+            "name": "Trigger: Vardag 08:00",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [200, 300],
+            "notes": "Kör varje vardag klockan 08:00 svensk tid. Kan triggas manuellt."
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "={{$env.SUPABASE_URL}}/rest/v1/leads",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        { "name": "select", "value": "*" },
+                        { "name": "status", "value": "eq.Kall" },
+                        { "name": "icp_match", "value": "gte.70" },
+                        { "name": "linkedin_sent", "value": "eq.false" },
+                        { "name": "order", "value": "icp_match.desc" },
+                        { "name": "limit", "value": "10" }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "supabase-get-leads",
+            "name": "Supabase: Hämta ICP-leads",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [420, 300],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "supabase-cred",
+                    "name": "Supabase Service Key"
+                }
+            },
+            "notes": "Hämtar max 10 kvalificerade leads: Status=Kall, ICP ≥70, LinkedIn ej skickat. Returnerar JSON-array."
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "// Supabase returnerar en JSON-array — dela upp till individuella n8n-items\nconst leads = Array.isArray($input.item.json) ? $input.item.json : [$input.item.json];\nif (leads.length === 0) return [];\nreturn leads.map(lead => ({ json: lead }));"
+            },
+            "id": "split-leads",
+            "name": "Dela upp leads",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [420, 300],
+            "notes": "Supabase REST API returnerar en array. Denna nod delar upp arrayen till enskilda items så att varje lead behandlas individuellt."
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": { "combinator": "and" },
+                    "conditions": [
+                        {
+                            "leftValue": "={{$json.antal_anstallda}}",
+                            "rightValue": 5,
+                            "operator": { "type": "number", "operation": "gte" }
+                        },
+                        {
+                            "leftValue": "={{$json.antal_anstallda}}",
+                            "rightValue": 50,
+                            "operator": { "type": "number", "operation": "lte" }
+                        }
+                    ]
+                }
+            },
+            "id": "filter-icp",
+            "name": "Filter: Validera ICP",
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2,
+            "position": [640, 300],
+            "notes": "Säkerhetskoll — säkerställer att lead matchar ICP (5–50 anst) innan AI-personalisering."
+        },
+        {
+            "parameters": {
+                "model": "claude-3-5-sonnet-20241022",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "Du är en expert på B2B-försäljning och LinkedIn-outreach för AI-automatiseringstjänster. Din uppgift är att skriva ett kortfattat, personaliserat LinkedIn-kontaktmeddelande (max 300 tecken) på svenska till en beslutsfattare.\n\nRegler:\n- Inga generiska fraser ('Hoppas du mår bra')\n- Referera specifikt till deras bransch eller roll\n- En tydlig nytta med AI-automatisering för deras typ av företag\n- Avsluta alltid med en öppen fråga\n- Signera: Mike | AI Upscale Agency\n- ALDRIG ljuga eller överdriva\n\nDu svarar ENBART med meddelandet, inget annat."
+                        },
+                        {
+                            "role": "user",
+                            "content": "Skriv ett LinkedIn-kontaktmeddelande till:\nNamn: {{$json.namn}}\nTitel: {{$json.titel}}\nFöretag: {{$json.foretag}}\nBransch: {{$json.bransch}}\nAntal anställda: {{$json.antal_anstallda}}\nLand: {{$json.land}}\nExtra info: {{$json.anteckningar}}"
+                        }
+                    ]
+                },
+                "options": {
+                    "maxTokens": 200,
+                    "temperature": 0.7
+                }
+            },
+            "id": "claude-personalize",
+            "name": "Claude AI: Personalisera meddelande",
+            "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.2,
+            "position": [860, 300],
+            "credentials": {
+                "anthropicApi": {
+                    "id": "anthropic-cred",
+                    "name": "Anthropic API"
+                }
+            },
+            "notes": "Claude Sonnet genererar ett unikt, personaliserat kontaktmeddelande per lead baserat på roll, bransch och företagsstorlek."
+        },
+        {
+            "parameters": {
+                "method": "PATCH",
+                "url": "={{$env.SUPABASE_URL}}/rest/v1/leads",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        { "name": "id", "value": "=eq.{{$('Dela upp leads').item.json.id}}" }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        { "name": "Prefer", "value": "return=representation" }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "json",
+                "body": "={\n  \"status\": \"Kontaktad\",\n  \"linkedin_sent\": true,\n  \"linkedin_message\": \"{{$json.text}}\",\n  \"linkedin_sent_at\": \"{{$now.toISO()}}\",\n  \"follow_up_count\": 0\n}",
+                "options": {}
+            },
+            "id": "supabase-update-lead",
+            "name": "Supabase: Uppdatera lead-status",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [1080, 300],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "supabase-cred",
+                    "name": "Supabase Service Key"
+                }
+            },
+            "notes": "Markerar lead som Kontaktad, sparar det genererade LinkedIn-meddelandet och sätter linkedin_sent=true."
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.hubapi.com/crm/v3/objects/contacts",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendBody": true,
+                "contentType": "json",
+                "body": "={\n  \"properties\": {\n    \"firstname\": \"{{$('Dela upp leads').item.json.namn.split(' ')[0]}}\",\n    \"lastname\": \"{{$('Dela upp leads').item.json.namn.split(' ').slice(1).join(' ')}}\",\n    \"company\": \"{{$('Dela upp leads').item.json.foretag}}\",\n    \"jobtitle\": \"{{$('Dela upp leads').item.json.titel}}\",\n    \"hs_lead_status\": \"NEW\",\n    \"lifecyclestage\": \"lead\",\n    \"linkedin_bio\": \"{{$('Dela upp leads').item.json.linkedin_url}}\"\n  }\n}",
+                "options": {
+                    "response": {
+                        "response": { "fullResponse": false }
+                    }
+                }
+            },
+            "id": "hubspot-create-contact",
+            "name": "HubSpot: Skapa/uppdatera kontakt",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [1080, 480],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "hubspot-cred",
+                    "name": "HubSpot API Key"
+                }
+            },
+            "notes": "Skapar kontakt i HubSpot CRM med lifecycle stage 'lead'.",
+            "onError": "continueErrorOutput"
+        },
+        {
+            "parameters": {
+                "amount": 3,
+                "unit": "days"
+            },
+            "id": "wait-followup-1",
+            "name": "Vänta 3 dagar",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [1300, 300],
+            "notes": "Familiarity Loop Steg 2: väntar 3 dagar innan uppföljning 1."
+        },
+        {
+            "parameters": {
+                "model": "claude-3-5-sonnet-20241022",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "Du skriver ett kortfattat uppföljningsmeddelande (max 200 tecken) på svenska för LinkedIn. Ton: vänlig, inte desperat. Referera till det tidigare meddelandet. Fråga om de har haft tid att tänka på det. ENBART meddelandet som svar."
+                        },
+                        {
+                            "role": "user",
+                            "content": "Uppföljning till {{$('Dela upp leads').item.json.namn}} ({{$('Dela upp leads').item.json.titel}} på {{$('Dela upp leads').item.json.foretag}}).\nUrsprungligt meddelande: {{$('Claude AI: Personalisera meddelande').item.json.text}}"
+                        }
+                    ]
+                },
+                "options": {
+                    "maxTokens": 150,
+                    "temperature": 0.6
+                }
+            },
+            "id": "claude-followup-1",
+            "name": "Claude AI: Uppföljning 1",
+            "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.2,
+            "position": [1520, 300],
+            "credentials": {
+                "anthropicApi": {
+                    "id": "anthropic-cred",
+                    "name": "Anthropic API"
+                }
+            },
+            "notes": "Genererar Familiarity Loop uppföljning 1 — mjuk påminnelse efter 3 dagar."
+        },
+        {
+            "parameters": {
+                "method": "PATCH",
+                "url": "={{$env.SUPABASE_URL}}/rest/v1/leads",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        { "name": "id", "value": "=eq.{{$('Dela upp leads').item.json.id}}" }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        { "name": "Prefer", "value": "return=representation" }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "json",
+                "body": "={\n  \"status\": \"Kontaktad\",\n  \"follow_up_count\": 1\n}",
+                "options": {}
+            },
+            "id": "supabase-log-followup1",
+            "name": "Supabase: Logga uppföljning 1",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [1740, 300],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "supabase-cred",
+                    "name": "Supabase Service Key"
+                }
+            },
+            "notes": "Uppdaterar follow_up_count till 1 i Supabase."
+        },
+        {
+            "parameters": {
+                "fromEmail": "aiupscaleagency@gmail.com",
+                "toEmail": "aiupscaleagency@gmail.com",
+                "subject": "⚠️ AIOS Alert: LinkedIn Outreach-fel",
+                "emailType": "text",
+                "message": "Ett fel uppstod i LinkedIn Outreach-workflowet.\n\nFel: {{$json.error.message}}\nTidpunkt: {{$now.toISO()}}\n\nKontrollera n8n-loggen: http://72.60.36.92:5678"
+            },
+            "id": "error-email",
+            "name": "Error Alert: Skicka e-post",
+            "type": "n8n-nodes-base.gmail",
+            "typeVersion": 2.1,
+            "position": [860, 540],
+            "credentials": {
+                "gmailOAuth2": {
+                    "id": "gmail-cred",
+                    "name": "Gmail OAuth"
+                }
+            },
+            "notes": "Error handling — skickar e-postvarning till Mike om något steg fallerar."
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "name": "workflow_run_id",
+                            "value": "={{$execution.id}}",
+                            "type": "string"
+                        },
+                        {
+                            "name": "leads_processed",
+                            "value": "={{$('Dela upp leads').all().length}}",
+                            "type": "number"
+                        },
+                        {
+                            "name": "timestamp",
+                            "value": "={{$now.toISO()}}",
+                            "type": "string"
+                        },
+                        {
+                            "name": "status",
+                            "value": "completed",
+                            "type": "string"
+                        },
+                        {
+                            "name": "databas",
+                            "value": "supabase",
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "id": "set-summary",
+            "name": "Sammanställ körningsdata",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.3,
+            "position": [1960, 300],
+            "notes": "Sammanfattning av körningen för loggning."
+        }
+    ],
+    "connections": {
+        "Trigger: Vardag 08:00": {
+            "main": [[{ "node": "Supabase: Hämta ICP-leads", "type": "main", "index": 0 }]]
+        },
+        "Supabase: Hämta ICP-leads": {
+            "main": [[{ "node": "Dela upp leads", "type": "main", "index": 0 }]]
+        },
+        "Dela upp leads": {
+            "main": [[{ "node": "Filter: Validera ICP", "type": "main", "index": 0 }]]
+        },
+        "Filter: Validera ICP": {
+            "main": [[{ "node": "Claude AI: Personalisera meddelande", "type": "main", "index": 0 }]]
+        },
+        "Claude AI: Personalisera meddelande": {
+            "main": [
+                [
+                    { "node": "Supabase: Uppdatera lead-status", "type": "main", "index": 0 },
+                    { "node": "HubSpot: Skapa/uppdatera kontakt", "type": "main", "index": 0 }
+                ]
+            ]
+        },
+        "Supabase: Uppdatera lead-status": {
+            "main": [[{ "node": "Vänta 3 dagar", "type": "main", "index": 0 }]]
+        },
+        "Vänta 3 dagar": {
+            "main": [[{ "node": "Claude AI: Uppföljning 1", "type": "main", "index": 0 }]]
+        },
+        "Claude AI: Uppföljning 1": {
+            "main": [[{ "node": "Supabase: Logga uppföljning 1", "type": "main", "index": 0 }]]
+        },
+        "Supabase: Logga uppföljning 1": {
+            "main": [[{ "node": "Sammanställ körningsdata", "type": "main", "index": 0 }]]
+        },
+        "HubSpot: Skapa/uppdatera kontakt": {
+            "error": [[{ "node": "Error Alert: Skicka e-post", "type": "main", "index": 0 }]]
+        }
+    },
+    "pinData": {},
+    "settings": {
+        "executionOrder": "v1",
+        "timezone": "Europe/Stockholm",
+        "errorWorkflow": "",
+        "maxParallelRuns": 1,
+        "callerPolicy": "any"
+    },
+    "staticData": null,
+    "tags": ["linkedin", "outreach", "lead-gen", "aios", "supabase"],
+    "triggerCount": 1,
+    "updatedAt": "2026-03-24T10:00:00.000Z",
+    "versionId": "v2"
+}

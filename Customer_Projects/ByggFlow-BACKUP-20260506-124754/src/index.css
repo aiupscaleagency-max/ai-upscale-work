@@ -1,0 +1,123 @@
+/* @import måste komma först för PostCSS */
+@import "leaflet/dist/leaflet.css";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: #f8f6f3;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: #1c1917;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
+/* Slide-in animation för toasts */
+@keyframes slide-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-in { animation: slide-in 0.25s ease-out; }
+
+/* Pulse-animation för live-spårning – grön neon */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(0, 217, 126, 0.7); }
+  70% { box-shadow: 0 0 0 14px rgba(0, 217, 126, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 217, 126, 0); }
+}
+.live-dot { animation: pulse-ring 1.8s infinite; }
+
+/* Live-panel – mörk digital yta */
+.digital-panel {
+  background: linear-gradient(180deg, #0f1620 0%, #0a1018 100%);
+  color: #e2f4ec;
+  position: relative;
+}
+.digital-panel::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 217, 126, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 217, 126, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+.digital-panel > * { position: relative; z-index: 1; }
+
+/* Neon-text + tabular nums för siffror */
+.neon-text {
+  color: #34f5a0;
+  text-shadow: 0 0 8px rgba(52, 245, 160, 0.55), 0 0 24px rgba(0, 217, 126, 0.35);
+}
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Ticker-animation (live-puls för räknare) */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+.flicker { animation: flicker 2s ease-in-out infinite; }
+
+/* Linje-skanning (digital effekt) */
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.scan-line::after {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, #00d97e, transparent);
+  animation: scan 3s linear infinite;
+}
+
+/* Leaflet markör-popup styling */
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  font-family: "Inter", sans-serif !important;
+}
+.leaflet-container {
+  font-family: "Inter", sans-serif !important;
+  border-radius: 12px;
+  position: relative !important;
+}
+
+/* Fix: Tailwind preflight kan bryta Leaflet-pane positioning */
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+  position: absolute !important;
+  left: 0;
+  top: 0;
+}
+.leaflet-container img {
+  max-width: none !important;
+}

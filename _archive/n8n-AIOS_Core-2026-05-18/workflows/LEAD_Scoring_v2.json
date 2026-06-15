@@ -1,0 +1,230 @@
+{
+    "name": "LEAD_Scoring_v2",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "lead-scoring",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Webhook: Inkommande lead",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [200, 300],
+            "notes": "Tar emot lead-data via POST. Anropas från LinkedIn-workflow, Make.com eller manuellt."
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "={{$env.SUPABASE_URL}}/rest/v1/leads",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        { "name": "select", "value": "id,email" },
+                        { "name": "email", "value": "=eq.{{$json.email}}" },
+                        { "name": "limit", "value": "1" }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        { "name": "Prefer", "value": "count=exact" }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "supabase-check-existing",
+            "name": "Supabase: Kolla existerande lead",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [420, 300],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "supabase-cred",
+                    "name": "Supabase Service Key"
+                }
+            },
+            "notes": "Kontrollerar om lead med samma e-post redan finns i Supabase för att undvika dubbelscoring."
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "// Kontrollera om lead redan finns (Supabase returnerar array)\n// Om arrayen är tom = ny lead, gå vidare\n// Om arrayen innehåller element = dubblett, stoppa\nconst existing = $input.item.json;\nconst count = Array.isArray(existing) ? existing.length : 0;\n\nif (count > 0) {\n  // Lead finns redan — returnera tomt för att stoppa flödet\n  return [];\n}\n\n// Ny lead — skicka vidare webhook-data\nreturn [{ json: $('Webhook: Inkommande lead').item.json }];"
+            },
+            "id": "check-duplicate",
+            "name": "Kontrollera dubblett",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [640, 300],
+            "notes": "Stoppar flödet om lead-e-posten redan finns i Supabase. Skickar annars vidare webhook-data."
+        },
+        {
+            "parameters": {
+                "model": "claude-3-5-sonnet-20241022",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "Du är en expert på B2B-försäljning och ICP-analys för AI Upscale Agency.\n\nVår ICP (Ideal Customer Profile):\n- Roll: VD, COO, Grundare, Partner\n- Företagsstorlek: 5-50 anställda\n- Bransch: SaaS, konsult, rekrytering, fastighet\n- Geografi: Sverige, Norge\n- Smärtpunkt: Vill skala utan att anställa, vill automatisera manuella processer\n- Budget: Kan köpa tjänster för 14 900-69 900 kr/mån\n\nVåra produkter:\n- Starter Workforce: 14 900 kr/mån (2-3 AI-agenter)\n- Growth Workforce: 34 900 kr/mån (5-8 AI-agenter + integrations)\n- Full AI OS: 69 900 kr/mån (komplett AI-operativsystem)\n\nDin uppgift: Ge en ICP-score 0-100 och förslag på rätt produkt.\n\nSvara ENBART med valid JSON i detta format:\n{\n  \"icp_score\": 85,\n  \"rollmatch\": true,\n  \"branschematch\": true,\n  \"storleksmatch\": true,\n  \"geografimatch\": true,\n  \"rekommenderad_produkt\": \"Growth Workforce\",\n  \"motivering\": \"Kort motivering på svenska (max 2 meningar)\",\n  \"nasta_steg\": \"Skicka kontaktförfrågan LinkedIn\"\n}"
+                        },
+                        {
+                            "role": "user",
+                            "content": "Scora detta lead:\nNamn: {{$json.namn}}\nTitel: {{$json.titel}}\nFöretag: {{$json.foretag}}\nBransch: {{$json.bransch}}\nAntal anställda: {{$json.antal_anstallda}}\nLand: {{$json.land}}\nLinkedIn: {{$json.linkedin_url}}\nKälla: {{$json.kalla}}"
+                        }
+                    ]
+                },
+                "options": {
+                    "maxTokens": 400,
+                    "temperature": 0.2
+                }
+            },
+            "id": "claude-score",
+            "name": "Claude AI: ICP-scoring",
+            "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.2,
+            "position": [860, 300],
+            "credentials": {
+                "anthropicApi": {
+                    "id": "anthropic-cred",
+                    "name": "Anthropic API"
+                }
+            },
+            "notes": "Claude analyserar lead mot ICP och returnerar score 0-100, rekommenderad produkt och nästa steg."
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "// Parsar Claude AI:s JSON-svar säkert\ntry {\n  const text = $input.item.json.text;\n  const jsonMatch = text.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('Inget JSON hittades i AI-svaret');\n  \n  const scoring = JSON.parse(jsonMatch[0]);\n  \n  return {\n    json: {\n      ...scoring,\n      lead_data: $('Webhook: Inkommande lead').item.json,\n      scored_at: new Date().toISOString()\n    }\n  };\n} catch (error) {\n  throw new Error(`Fel vid JSON-parsning av AI-svar: ${error.message}`);\n}"
+            },
+            "id": "parse-score",
+            "name": "Parsa AI-scoring",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1080, 300],
+            "notes": "Parsar Claude:s JSON-svar och extraherar score, motivering och nästa steg."
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": { "combinator": "and" },
+                    "conditions": [
+                        {
+                            "leftValue": "={{$json.icp_score}}",
+                            "rightValue": 60,
+                            "operator": { "type": "number", "operation": "gte" }
+                        }
+                    ]
+                }
+            },
+            "id": "filter-highscore",
+            "name": "Filter: Score ≥ 60?",
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2,
+            "position": [1300, 300],
+            "notes": "Leads under 60 sparas inte. Leads ≥60 går vidare till Supabase och LinkedIn-workflow."
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{$env.SUPABASE_URL}}/rest/v1/leads",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        { "name": "Prefer", "value": "return=representation" }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "json",
+                "body": "={\n  \"namn\": \"{{$json.lead_data.namn}}\",\n  \"titel\": \"{{$json.lead_data.titel}}\",\n  \"foretag\": \"{{$json.lead_data.foretag}}\",\n  \"bransch\": \"{{$json.lead_data.bransch}}\",\n  \"antal_anstallda\": {{$json.lead_data.antal_anstallda}},\n  \"land\": \"{{$json.lead_data.land}}\",\n  \"linkedin_url\": \"{{$json.lead_data.linkedin_url}}\",\n  \"email\": \"{{$json.lead_data.email}}\",\n  \"icp_match\": {{$json.icp_score}},\n  \"rekommenderad_produkt\": \"{{$json.rekommenderad_produkt}}\",\n  \"anteckningar\": \"{{$json.motivering}}\",\n  \"status\": \"Kall\",\n  \"linkedin_sent\": false\n}",
+                "options": {}
+            },
+            "id": "supabase-save-lead",
+            "name": "Supabase: Spara scorat lead",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [1520, 300],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "supabase-cred",
+                    "name": "Supabase Service Key"
+                }
+            },
+            "notes": "Sparar scorat lead i Supabase leads-tabellen. Prefer: return=representation returnerar det skapade objektet med id."
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={\n  \"success\": true,\n  \"lead\": \"{{$json.lead_data.namn}}\",\n  \"icp_score\": {{$json.icp_score}},\n  \"rekommenderad_produkt\": \"{{$json.rekommenderad_produkt}}\",\n  \"nasta_steg\": \"{{$json.nasta_steg}}\",\n  \"supabase_id\": \"{{$('Supabase: Spara scorat lead').item.json[0].id}}\"\n}"
+            },
+            "id": "webhook-response",
+            "name": "Webhook: Svara med scoring",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [1740, 300],
+            "notes": "Returnerar scoring-resultat till anroparen med Supabase-id för spårning."
+        },
+        {
+            "parameters": {
+                "fromEmail": "aiupscaleagency@gmail.com",
+                "toEmail": "aiupscaleagency@gmail.com",
+                "subject": "⚠️ AIOS Alert: Lead Scoring-fel",
+                "emailType": "text",
+                "message": "Fel i Lead Scoring-workflowet.\n\nFel: {{$json.error.message}}\nTidpunkt: {{$now.toISO()}}\n\nKontrollera n8n: http://72.60.36.92:5678"
+            },
+            "id": "error-handler",
+            "name": "Error Alert: Skicka e-post",
+            "type": "n8n-nodes-base.gmail",
+            "typeVersion": 2.1,
+            "position": [860, 520],
+            "credentials": {
+                "gmailOAuth2": {
+                    "id": "gmail-cred",
+                    "name": "Gmail OAuth"
+                }
+            },
+            "notes": "Fångar upp fel och skickar e-postvarning till Mike."
+        }
+    ],
+    "connections": {
+        "Webhook: Inkommande lead": {
+            "main": [[{ "node": "Supabase: Kolla existerande lead", "type": "main", "index": 0 }]]
+        },
+        "Supabase: Kolla existerande lead": {
+            "main": [[{ "node": "Kontrollera dubblett", "type": "main", "index": 0 }]]
+        },
+        "Kontrollera dubblett": {
+            "main": [[{ "node": "Claude AI: ICP-scoring", "type": "main", "index": 0 }]]
+        },
+        "Claude AI: ICP-scoring": {
+            "main": [[{ "node": "Parsa AI-scoring", "type": "main", "index": 0 }]],
+            "error": [[{ "node": "Error Alert: Skicka e-post", "type": "main", "index": 0 }]]
+        },
+        "Parsa AI-scoring": {
+            "main": [[{ "node": "Filter: Score ≥ 60?", "type": "main", "index": 0 }]]
+        },
+        "Filter: Score ≥ 60?": {
+            "main": [[{ "node": "Supabase: Spara scorat lead", "type": "main", "index": 0 }]]
+        },
+        "Supabase: Spara scorat lead": {
+            "main": [[{ "node": "Webhook: Svara med scoring", "type": "main", "index": 0 }]]
+        }
+    },
+    "pinData": {},
+    "settings": {
+        "executionOrder": "v1",
+        "timezone": "Europe/Stockholm",
+        "maxParallelRuns": 5,
+        "callerPolicy": "any"
+    },
+    "staticData": null,
+    "tags": ["lead-scoring", "icp", "claude", "aios", "supabase"],
+    "triggerCount": 1,
+    "updatedAt": "2026-03-24T10:00:00.000Z",
+    "versionId": "v2"
+}

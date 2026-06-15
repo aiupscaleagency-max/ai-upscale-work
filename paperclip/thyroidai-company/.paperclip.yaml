@@ -1,0 +1,46 @@
+company:
+  id: thyroidai-medical-team
+  name: ThyroidAI Medical Team
+  description: AI-läkarteam för sköldkörtelsjuka — 7 specialister dygnet runt
+  status: active
+  budgetMonthlyCents: 500000  # 5000 SEK
+
+api:
+  baseUrl: http://localhost:3100/api
+  deploymentMode: authenticated
+
+environment:
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+  GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY}
+  SUPABASE_URL: ${SUPABASE_URL}
+  SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+  OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+
+integrations:
+  supabase:
+    enabled: true
+    tables:
+      - agent_consultations
+      - agent_insights
+      - conversations
+      - messages
+  gemini_live:
+    enabled: true
+    model: gemini-2.0-flash-live-001
+    websocket_path: /ws/live/{agentId}
+
+visibility:
+  # Synligt för patienter i appen
+  patient_visible:
+    - agent_status        # online/jobbar/analyserar
+    - activity_feed       # live-händelser
+    - collaboration_log   # vilka agenter som samarbetar
+    - session_transcripts # efter samtal
+  # Synligt BARA för Mike (Paperclip dashboard)
+  admin_only:
+    - cost_tracking
+    - raw_logs
+    - patient_profiles
+    - supabase_queries
+    - system_prompts

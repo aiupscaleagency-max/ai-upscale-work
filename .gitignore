@@ -1,0 +1,52 @@
+# === AI Upscale Work — root .gitignore ===
+# Säkerhet först: inga hemligheter eller byggartefakter till GitHub (även privat repo)
+
+# Hemligheter (åker ALDRIG upp)
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.template
+**/*.key
+**/*.pem
+**/secrets/
+**/credentials*
+
+# Beroenden & byggoutput
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/.vercel/
+**/.turbo/
+**/*.tsbuildinfo
+
+# OS / editor-skräp
+**/.DS_Store
+**/Thumbs.db
+
+# Temp & drive-sync
+.tmp*
+**/.tmp*
+.gstack/
+
+# Loggar & pid
+*.log
+*.pid
+
+# Lokala backuper + stora arkiv (överskrider GitHubs 100MB-gräns, hör inte hemma här)
+backups/
+*.tar.gz
+*.tgz
+*.zip
+
+# Lokal cache
+.cache/
+**/.cache/
+
+# Inbäddade repos som INTE ska vara submoduler
+# AIOS_Core_landing = git-worktree av AIOS_Core (finns redan via den submodulen)
+# fluentic-ai-backup = lokal backup, samma remote som fluentic-ai
+# awesome-claude-design = tredjeparts (VoltAgent), inte vårt repo
+AIOS_Core_landing/
+fluentic-ai-backup-2026-05-06/
+awesome-claude-design/

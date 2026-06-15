@@ -1,0 +1,15 @@
+{
+  "folders": [
+    { "name": "AI Upscale (root)", "path": "." },
+    { "name": "ThyroidAI", "path": "Customer_Projects/ThyroidAI : Läkarteamet" },
+    { "name": "Fluentic AI", "path": "fluentic-ai" },
+    { "name": "AIOS Core", "path": "AIOS_Core" },
+    { "name": "Byggflow", "path": "AIOS_Core" },
+    { "name": "CEO with ADHD", "path": "ceo-with-adhd" },
+    { "name": "The Engine", "path": "the-engine" },
+    { "name": "Obsidian Brain", "path": "Obsidian-Vaults/AI-Upscale-Brain" }
+  ],
+  "settings": {
+    "window.title": "AI Upscale Agency — ${activeEditorShort}"
+  }
+}

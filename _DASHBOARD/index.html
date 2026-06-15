@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Upscale — Knowledge Graph Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c232d; --line:#2a323d;
+    --txt:#e6edf3; --dim:#8b949e; --accent:#58a6ff;
+    --kund:#58a6ff; --youtube:#d264d8; --aios:#3fb950; --ovrigt:#e3a008;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  header { padding:22px 28px 16px; border-bottom:1px solid var(--line); }
+  h1 { font-size:20px; font-weight:650; letter-spacing:-.2px; }
+  h1 span { color:var(--dim); font-weight:400; }
+  .sub { color:var(--dim); font-size:13px; margin-top:3px; }
+  .stats { display:flex; gap:26px; margin-top:14px; flex-wrap:wrap; }
+  .stat .n { font-size:22px; font-weight:680; }
+  .stat .l { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.6px; }
+  .wrap { padding:20px 28px 60px; }
+  .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+  #search { background:var(--panel); border:1px solid var(--line); color:var(--txt);
+    padding:9px 13px; border-radius:8px; font-size:14px; width:280px; outline:none; }
+  #search:focus { border-color:var(--accent); }
+  .filt { background:var(--panel); border:1px solid var(--line); color:var(--dim);
+    padding:7px 13px; border-radius:20px; font-size:12.5px; cursor:pointer; user-select:none; }
+  .filt.on { color:var(--txt); border-color:var(--accent); background:var(--panel2); }
+  .filt .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:1px; }
+  .graphbox { background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    margin-bottom:24px; overflow:hidden; }
+  .graphbox .cap { padding:11px 16px; font-size:12.5px; color:var(--dim); border-bottom:1px solid var(--line); }
+  svg { display:block; width:100%; height:480px; cursor:grab; }
+  svg:active { cursor:grabbing; }
+  .node-label { font-size:10.5px; fill:var(--txt); pointer-events:none; }
+  .cat-label { font-size:12px; font-weight:650; fill:var(--txt); pointer-events:none; }
+  .secttitle { font-size:13px; font-weight:600; color:var(--dim); text-transform:uppercase;
+    letter-spacing:.7px; margin:22px 0 12px; display:flex; align-items:center; gap:8px; }
+  .secttitle .dot { width:9px; height:9px; border-radius:50%; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:13px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:11px;
+    padding:15px; position:relative; transition:border-color .15s,transform .1s; }
+  .card:hover { border-color:var(--accent); transform:translateY(-2px); }
+  .card.tom { opacity:.55; }
+  .card .stripe { position:absolute; left:0; top:14px; bottom:14px; width:3px; border-radius:3px; }
+  .card h3 { font-size:14.5px; font-weight:620; margin-bottom:3px; padding-left:9px; word-break:break-word; }
+  .card .kat { font-size:11px; color:var(--dim); padding-left:9px; margin-bottom:11px; }
+  .card .metrics { display:flex; gap:14px; padding-left:9px; margin-bottom:12px; }
+  .card .metrics div { font-size:12px; color:var(--dim); }
+  .card .metrics b { color:var(--txt); font-size:15px; font-weight:660; display:block; }
+  .badge { display:inline-block; font-size:10.5px; padding:2px 8px; border-radius:10px;
+    margin-left:9px; font-weight:600; }
+  .badge.ok { background:rgba(63,185,80,.15); color:#3fb950; }
+  .badge.tom { background:rgba(227,160,8,.15); color:#e3a008; }
+  .actions { display:flex; gap:8px; padding-left:9px; }
+  .btn { flex:1; text-align:center; padding:7px 0; border-radius:7px; font-size:12px;
+    text-decoration:none; border:1px solid var(--line); color:var(--txt); transition:background .12s; }
+  .btn.primary { background:var(--accent); color:#0e1116; border-color:var(--accent); font-weight:600; }
+  .btn.primary:hover { filter:brightness(1.1); }
+  .btn.ghost:hover { background:var(--panel2); }
+  .btn.disabled { opacity:.4; pointer-events:none; }
+  .tip { position:fixed; pointer-events:none; background:#0a0d12; border:1px solid var(--line);
+    padding:7px 11px; border-radius:7px; font-size:12px; opacity:0; transition:opacity .1s; z-index:50; }
+  footer { color:var(--dim); font-size:11.5px; padding:0 28px 30px; line-height:1.7; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AI Upscale <span>— Knowledge Graph Dashboard</span></h1>
+  <div class="sub">Alla Graphify-projekt på ett ställe. Klicka en projektnod eller ett kort för att öppna dess graf.</div>
+  <div class="stats">
+    <div class="stat"><div class="n">26</div><div class="l">Aktiva projekt</div></div>
+    <div class="stat"><div class="n">6 835</div><div class="l">Kunskapsnoder</div></div>
+    <div class="stat"><div class="n">10 629</div><div class="l">Kopplingar</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">Tomma (bygg om)</div></div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="toolbar">
+    <input id="search" placeholder="Sök projekt...">
+    <span class="filt on" data-cat="all">Alla</span>
+    <span class="filt on" data-cat="Kundprojekt"><span class="dot" style="background:var(--kund)"></span>Kundprojekt</span>
+    <span class="filt on" data-cat="YouTube"><span class="dot" style="background:var(--youtube)"></span>YouTube</span>
+    <span class="filt on" data-cat="AIOS/Infra"><span class="dot" style="background:var(--aios)"></span>AIOS/Infra</span>
+    <span class="filt on" data-cat="Övrigt"><span class="dot" style="background:var(--ovrigt)"></span>Övrigt</span>
+  </div>
+  <div class="graphbox">
+    <div class="cap">Översiktskarta — nodstorlek = antal kunskapsnoder · dra för att flytta · scrolla för att zooma</div>
+    <svg id="map"></svg>
+  </div>
+  <div id="grid-host"></div>
+</div>
+<footer>
+  Genererad 2026-06-05 · Data från varje projekts <code>graphify-out/graph.json</code><br>
+  Uppdatera denna sida: dubbelklicka <code>Uppdatera dashboard.command</code> i mappen _DASHBOARD.
+</footer>
+<div class="tip" id="tip"></div>
+<script>
+const PROJECTS = [{"namn": "ThyroidAI : Läkarteamet", "path": "Customer_Projects/ThyroidAI : Läkarteamet", "noder": 1535, "edges": 2313, "communities": 140, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/ThyroidAI : Läkarteamet/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/ThyroidAI : Läkarteamet/graphify-out/GRAPH_REPORT.md"}, {"namn": "Kusinerna_Kenzo", "path": "YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/Kusinerna_Kenzo", "noder": 875, "edges": 865, "communities": 55, "uppdaterad": "2026-05-13", "har_html": true, "har_rapport": true, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/Kusinerna_Kenzo/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/Kusinerna_Kenzo/graphify-out/GRAPH_REPORT.md"}, {"namn": "mikael-trading-os", "path": "Customer_Projects/mikael-trading-os", "noder": 624, "edges": 1161, "communities": 44, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/mikael-trading-os/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/mikael-trading-os/graphify-out/GRAPH_REPORT.md"}, {"namn": "Arbetsformedlingen", "path": "Customer_Projects/Arbetsformedlingen", "noder": 583, "edges": 579, "communities": 64, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/Arbetsformedlingen/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/Arbetsformedlingen/graphify-out/GRAPH_REPORT.md"}, {"namn": "ceo-with-adhd", "path": "ceo-with-adhd", "noder": 504, "edges": 869, "communities": 31, "uppdaterad": "2026-05-23", "har_html": true, "har_rapport": true, "kategori": "Övrigt", "aktiv": true, "graf_lank": "../ceo-with-adhd/graphify-out/graph.html", "rapport_lank": "../ceo-with-adhd/graphify-out/GRAPH_REPORT.md"}, {"namn": "the-engine", "path": "the-engine", "noder": 467, "edges": 758, "communities": 43, "uppdaterad": "2026-05-22", "har_html": true, "har_rapport": true, "kategori": "AIOS/Infra", "aktiv": true, "graf_lank": "../the-engine/graphify-out/graph.html", "rapport_lank": "../the-engine/graphify-out/GRAPH_REPORT.md"}, {"namn": "Infrea-Insight", "path": "Customer_Projects/Infrea-Insight", "noder": 305, "edges": 643, "communities": 17, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/Infrea-Insight/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/Infrea-Insight/graphify-out/GRAPH_REPORT.md"}, {"namn": "stjarnganget", "path": "YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/stjarnganget", "noder": 293, "edges": 272, "communities": 22, "uppdaterad": "2026-05-13", "har_html": true, "har_rapport": true, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/stjarnganget/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/stjarnganget/graphify-out/GRAPH_REPORT.md"}, {"namn": "Graphify- Mall-AI-OS", "path": "Customer_Projects/Graphify- Mall-AI-OS", "noder": 286, "edges": 877, "communities": 20, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/Graphify- Mall-AI-OS/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/Graphify- Mall-AI-OS/graphify-out/GRAPH_REPORT.md"}, {"namn": "ByggFlow", "path": "Customer_Projects/ByggFlow", "noder": 248, "edges": 490, "communities": 17, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/ByggFlow/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/ByggFlow/graphify-out/GRAPH_REPORT.md"}, {"namn": "ByggFlow-BACKUP-20260506-124754", "path": "Customer_Projects/ByggFlow-BACKUP-20260506-124754", "noder": 220, "edges": 421, "communities": 14, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/ByggFlow-BACKUP-20260506-124754/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/ByggFlow-BACKUP-20260506-124754/graphify-out/GRAPH_REPORT.md"}, {"namn": "ze-parts", "path": "Customer_Projects/ze-parts", "noder": 170, "edges": 290, "communities": 15, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/ze-parts/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/ze-parts/graphify-out/GRAPH_REPORT.md"}, {"namn": "AIOS_Core_landing", "path": "AIOS_Core_landing", "noder": 168, "edges": 214, "communities": 0, "uppdaterad": "2026-05-16", "har_html": true, "har_rapport": true, "kategori": "AIOS/Infra", "aktiv": true, "graf_lank": "../AIOS_Core_landing/graphify-out/graph.html", "rapport_lank": "../AIOS_Core_landing/graphify-out/GRAPH_REPORT.md"}, {"namn": "Paperclip", "path": "Customer_Projects/Paperclip", "noder": 160, "edges": 316, "communities": 16, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/Paperclip/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/Paperclip/graphify-out/GRAPH_REPORT.md"}, {"namn": "caso-chile-dashboard", "path": "caso-chile-dashboard", "noder": 117, "edges": 178, "communities": 13, "uppdaterad": "2026-05-22", "har_html": true, "har_rapport": true, "kategori": "Övrigt", "aktiv": true, "graf_lank": "../caso-chile-dashboard/graphify-out/graph.html", "rapport_lank": "../caso-chile-dashboard/graphify-out/GRAPH_REPORT.md"}, {"namn": "aiupscale-monitor", "path": "aiupscale-monitor", "noder": 59, "edges": 93, "communities": 0, "uppdaterad": "2026-05-16", "har_html": false, "har_rapport": false, "kategori": "AIOS/Infra", "aktiv": true, "graf_lank": "../aiupscale-monitor/graphify-out/graph.html", "rapport_lank": "../aiupscale-monitor/graphify-out/GRAPH_REPORT.md"}, {"namn": "mooncake", "path": "YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/mooncake", "noder": 57, "edges": 53, "communities": 7, "uppdaterad": "2026-05-13", "har_html": true, "har_rapport": true, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/mooncake/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/mooncake/graphify-out/GRAPH_REPORT.md"}, {"namn": "AIOS_Core", "path": "AIOS_Core", "noder": 41, "edges": 80, "communities": 7, "uppdaterad": "2026-05-22", "har_html": true, "har_rapport": true, "kategori": "AIOS/Infra", "aktiv": true, "graf_lank": "../AIOS_Core/graphify-out/graph.html", "rapport_lank": "../AIOS_Core/graphify-out/GRAPH_REPORT.md"}, {"namn": "YOUTUBE KANAL - 4 KID_", "path": "YOUTUBE KANAL - 4 KID_", "noder": 24, "edges": 53, "communities": 0, "uppdaterad": "2026-05-16", "har_html": false, "har_rapport": false, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/graphify-out/GRAPH_REPORT.md"}, {"namn": "mio_familj", "path": "YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/mio_familj", "noder": 22, "edges": 20, "communities": 6, "uppdaterad": "2026-05-13", "har_html": true, "har_rapport": true, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/mio_familj/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/mio_familj/graphify-out/GRAPH_REPORT.md"}, {"namn": "maker_mice", "path": "YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/maker_mice", "noder": 21, "edges": 19, "communities": 5, "uppdaterad": "2026-05-13", "har_html": true, "har_rapport": true, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/maker_mice/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/maker_mice/graphify-out/GRAPH_REPORT.md"}, {"namn": "sing_a_lot", "path": "YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/sing_a_lot", "noder": 19, "edges": 17, "communities": 4, "uppdaterad": "2026-05-13", "har_html": true, "har_rapport": true, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/sing_a_lot/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/sing_a_lot/graphify-out/GRAPH_REPORT.md"}, {"namn": "professor_paw", "path": "YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/professor_paw", "noder": 19, "edges": 17, "communities": 4, "uppdaterad": "2026-05-13", "har_html": true, "har_rapport": true, "kategori": "YouTube", "aktiv": true, "graf_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/professor_paw/graphify-out/graph.html", "rapport_lank": "../YOUTUBE KANAL - 4 KID_/Youtube 4 Kids/professor_paw/graphify-out/GRAPH_REPORT.md"}, {"namn": "paperclip", "path": "paperclip", "noder": 14, "edges": 29, "communities": 0, "uppdaterad": "2026-05-16", "har_html": true, "har_rapport": true, "kategori": "Övrigt", "aktiv": true, "graf_lank": "../paperclip/graphify-out/graph.html", "rapport_lank": "../paperclip/graphify-out/GRAPH_REPORT.md"}, {"namn": "CEO with ADHD", "path": "Customer_Projects/CEO with ADHD", "noder": 2, "edges": 1, "communities": 1, "uppdaterad": "2026-05-20", "har_html": true, "har_rapport": true, "kategori": "Kundprojekt", "aktiv": true, "graf_lank": "../Customer_Projects/CEO with ADHD/graphify-out/graph.html", "rapport_lank": "../Customer_Projects/CEO with ADHD/graphify-out/GRAPH_REPORT.md"}, {"namn": "fluentic-ai", "path": "fluentic-ai", "noder": 2, "edges": 1, "communities": 1, "uppdaterad": "2026-05-22", "har_html": true, "har_rapport": true, "kategori": "Övrigt", "aktiv": true, "graf_lank": "../fluentic-ai/graphify-out/graph.html", "rapport_lank": "../fluentic-ai/graphify-out/GRAPH_REPORT.md"}, {"namn": "openclaw-deploy", "path": "openclaw-deploy", "noder": 0, "edges": 0, "communities": 0, "uppdaterad": "2026-05-16", "har_html": false, "har_rapport": false, "kategori": "AIOS/Infra", "aktiv": false, "graf_lank": "../openclaw-deploy/graphify-out/graph.html", "rapport_lank": "../openclaw-deploy/graphify-out/GRAPH_REPORT.md"}, {"namn": "content-templates", "path": "content-templates", "noder": 0, "edges": 0, "communities": 0, "uppdaterad": "2026-05-16", "har_html": false, "har_rapport": false, "kategori": "Övrigt", "aktiv": false, "graf_lank": "../content-templates/graphify-out/graph.html", "rapport_lank": "../content-templates/graphify-out/GRAPH_REPORT.md"}, {"namn": "awesome-claude-design", "path": "awesome-claude-design", "noder": 0, "edges": 0, "communities": 0, "uppdaterad": "2026-05-16", "har_html": false, "har_rapport": false, "kategori": "Övrigt", "aktiv": false, "graf_lank": "../awesome-claude-design/graphify-out/graph.html", "rapport_lank": "../awesome-claude-design/graphify-out/GRAPH_REPORT.md"}, {"namn": "Free Claude - OLIKA LLM i CLAUDE : OpenRouter", "path": "Free Claude - OLIKA LLM i CLAUDE : OpenRouter", "noder": 0, "edges": 0, "communities": 0, "uppdaterad": "2026-05-16", "har_html": false, "har_rapport": false, "kategori": "Övrigt", "aktiv": false, "graf_lank": "../Free Claude - OLIKA LLM i CLAUDE : OpenRouter/graphify-out/graph.html", "rapport_lank": "../Free Claude - OLIKA LLM i CLAUDE : OpenRouter/graphify-out/GRAPH_REPORT.md"}];
+const CATCOLOR = {"Kundprojekt":"#58a6ff","YouTube":"#d264d8","AIOS/Infra":"#3fb950","Övrigt":"#e3a008"};
+const tip = document.getElementById("tip");
+
+/* ---------- ÖVERSIKTSGRAF ---------- */
+const svg = d3.select("#map");
+const W = svg.node().clientWidth, H = 480;
+const g = svg.append("g");
+svg.call(d3.zoom().scaleExtent([0.3,3]).on("zoom", e => g.attr("transform", e.transform)));
+
+const cats = [...new Set(PROJECTS.map(p => p.kategori))];
+const nodes = [{id:"__hub__", typ:"hub", label:"AI Upscale"}];
+const links = [];
+cats.forEach(c => {
+  nodes.push({id:c, typ:"cat", label:c, kategori:c});
+  links.push({source:"__hub__", target:c});
+});
+PROJECTS.forEach(p => {
+  nodes.push({id:p.path, typ:"proj", label:p.namn, kategori:p.kategori,
+    noder:p.noder, edges:p.edges, aktiv:p.aktiv, lank:p.graf_lank, har_html:p.har_html});
+  links.push({source:p.kategori, target:p.path});
+});
+
+const r = d => d.typ==="hub" ? 26 : d.typ==="cat" ? 15
+  : Math.max(6, Math.min(38, 6 + Math.sqrt(d.noder||0)*1.4));
+
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d=>d.id).distance(l => l.source.typ==="hub"?120:70))
+  .force("charge", d3.forceManyBody().strength(-260))
+  .force("center", d3.forceCenter(W/2, H/2))
+  .force("collide", d3.forceCollide(d => r(d)+14));
+
+const link = g.append("g").attr("stroke","#2a323d").attr("stroke-width",1.2)
+  .selectAll("line").data(links).join("line");
+
+const node = g.append("g").selectAll("g").data(nodes).join("g")
+  .attr("class","nodeg").style("cursor","pointer")
+  .call(d3.drag()
+    .on("start",(e,d)=>{if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+    .on("drag",(e,d)=>{d.fx=e.x;d.fy=e.y;})
+    .on("end",(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
+
+node.append("circle")
+  .attr("r", r)
+  .attr("fill", d => d.typ==="hub" ? "#e6edf3"
+    : d.typ==="cat" ? CATCOLOR[d.kategori]
+    : (d.aktiv ? CATCOLOR[d.kategori] : "#3a434f"))
+  .attr("fill-opacity", d => d.typ==="proj" && !d.aktiv ? .5 : (d.typ==="proj"?.85:1))
+  .attr("stroke", d => d.typ==="hub" ? "#58a6ff" : "#0e1116")
+  .attr("stroke-width", d => d.typ==="hub" ? 2 : 1.5)
+  .attr("stroke-dasharray", d => d.typ==="proj" && !d.aktiv ? "3,3" : null);
+
+node.append("text")
+  .attr("class", d => d.typ==="proj" ? "node-label" : "cat-label")
+  .attr("text-anchor","middle")
+  .attr("dy", d => r(d)+12)
+  .text(d => d.label.length>22 ? d.label.slice(0,21)+"…" : d.label);
+
+node.on("mouseover",(e,d)=>{
+    if(d.typ!=="proj") return;
+    tip.innerHTML = `<b>${d.label}</b><br>${d.noder} noder · ${d.edges} kopplingar`
+      + (d.aktiv ? "" : "<br><span style='color:#e3a008'>Tom — behöver byggas om</span>");
+    tip.style.opacity=1;
+  })
+  .on("mousemove",e=>{tip.style.left=(e.clientX+14)+"px";tip.style.top=(e.clientY+14)+"px";})
+  .on("mouseout",()=>tip.style.opacity=0)
+  .on("click",(e,d)=>{
+    if(d.typ!=="proj") return;
+    if(d.aktiv && d.har_html){ window.open(d.lank,"_blank"); }
+    else { const c=document.getElementById("card-"+cssId(d.id));
+           if(c){c.scrollIntoView({behavior:"smooth",block:"center"});
+           c.style.borderColor="#58a6ff"; setTimeout(()=>c.style.borderColor="",1400);} }
+  });
+
+sim.on("tick",()=>{
+  link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y)
+      .attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+  node.attr("transform",d=>`translate(${d.x},${d.y})`);
+});
+
+/* ---------- PROJEKT-GRID ---------- */
+function cssId(s){ return s.replace(/[^a-zA-Z0-9]/g,"_"); }
+const host = document.getElementById("grid-host");
+cats.forEach(cat => {
+  const inCat = PROJECTS.filter(p=>p.kategori===cat)
+    .sort((a,b)=>b.noder-a.noder);
+  const sec = document.createElement("div");
+  sec.className = "catsection"; sec.dataset.cat = cat;
+  sec.innerHTML = `<div class="secttitle"><span class="dot" style="background:${CATCOLOR[cat]}"></span>${cat} · ${inCat.length}</div>`;
+  const grid = document.createElement("div"); grid.className="grid";
+  inCat.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card" + (p.aktiv?"":" tom");
+    card.id = "card-"+cssId(p.path);
+    card.dataset.cat = cat; card.dataset.namn = p.namn.toLowerCase();
+    const badge = p.aktiv ? `<span class="badge ok">Aktiv</span>`
+                          : `<span class="badge tom">Tom</span>`;
+    const grafBtn = (p.aktiv && p.har_html)
+      ? `<a class="btn primary" href="${encodeURI(p.graf_lank)}" target="_blank">Öppna graf →</a>`
+      : `<span class="btn primary disabled">Ingen graf</span>`;
+    const repBtn = p.har_rapport
+      ? `<a class="btn ghost" href="${encodeURI(p.rapport_lank)}" target="_blank">Rapport</a>`
+      : `<span class="btn ghost disabled">Rapport</span>`;
+    card.innerHTML = `
+      <div class="stripe" style="background:${CATCOLOR[cat]}"></div>
+      <h3>${p.namn}${badge}</h3>
+      <div class="kat">${p.path}</div>
+      <div class="metrics">
+        <div><b>${p.noder}</b>noder</div>
+        <div><b>${p.edges}</b>kopplingar</div>
+        <div><b>${p.communities||0}</b>kluster</div>
+      </div>
+      <div class="actions">${grafBtn}${repBtn}</div>`;
+    grid.appendChild(card);
+  });
+  sec.appendChild(grid); host.appendChild(sec);
+});
+
+/* ---------- SÖK + FILTER ---------- */
+let activeCats = new Set(cats);
+const search = document.getElementById("search");
+function apply(){
+  const q = search.value.toLowerCase().trim();
+  document.querySelectorAll(".card").forEach(c=>{
+    const okCat = activeCats.has(c.dataset.cat);
+    const okQ = !q || c.dataset.namn.includes(q);
+    c.classList.toggle("hidden", !(okCat&&okQ));
+  });
+  document.querySelectorAll(".catsection").forEach(s=>{
+    const vis = [...s.querySelectorAll(".card")].some(c=>!c.classList.contains("hidden"));
+    s.classList.toggle("hidden", !vis);
+  });
+  node.style("display", d => d.typ!=="proj" || activeCats.has(d.kategori)
+    ? (!q || d.label.toLowerCase().includes(q) || d.typ!=="proj" ? null : "none") : "none");
+}
+search.addEventListener("input", apply);
+document.querySelectorAll(".filt").forEach(f=>{
+  f.addEventListener("click",()=>{
+    const c = f.dataset.cat;
+    if(c==="all"){
+      // Toggla alla kategorier på/av i ett klick
+      const allOn = activeCats.size===cats.length;
+      activeCats = allOn ? new Set() : new Set(cats);
+      document.querySelectorAll(".filt").forEach(x=>x.classList.toggle("on",!allOn));
+    } else {
+      if(activeCats.has(c)){activeCats.delete(c);f.classList.remove("on");}
+      else{activeCats.add(c);f.classList.add("on");}
+      document.querySelector('.filt[data-cat="all"]')
+        .classList.toggle("on", activeCats.size===cats.length);
+    }
+    apply();
+  });
+});
+</script>
+</body>
+</html>

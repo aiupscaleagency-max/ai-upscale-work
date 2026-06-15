@@ -1,0 +1,45 @@
+[submodule "agent-os"]
+	path = agent-os
+	url = https://github.com/aiupscaleagency-max/agent-os.git
+[submodule "caso-chile-dashboard"]
+	path = caso-chile-dashboard
+	url = https://github.com/aiupscaleagency-max/caso-chile-dashboard.git
+[submodule "AIOS_Core"]
+	path = AIOS_Core
+	url = https://github.com/aiupscaleagency-max/AIOS_Core.git
+[submodule "fluentic-ai"]
+	path = fluentic-ai
+	url = https://github.com/aiupscaleagency-max/fluentic-ai.git
+[submodule "aiupscale-monitor"]
+	path = aiupscale-monitor
+	url = https://github.com/aiupscaleagency-max/aiupscale-monitor.git
+[submodule "Obsidian-Vaults/AI-Upscale-Brain"]
+	path = Obsidian-Vaults/AI-Upscale-Brain
+	url = https://github.com/aiupscaleagency-max/ai-upscale-brain-vault.git
+[submodule "Customer_Projects/ze-parts"]
+	path = Customer_Projects/ze-parts
+	url = https://github.com/aiupscaleagency-max/ze-parts.git
+[submodule "Customer_Projects/mikael-trading-os"]
+	path = Customer_Projects/mikael-trading-os
+	url = https://github.com/aiupscaleagency-max/mikael-trading-os.git
+[submodule "Customer_Projects/ByggFlow"]
+	path = Customer_Projects/ByggFlow
+	url = https://github.com/aiupscaleagency-max/byggflow.git
+[submodule "Customer_Projects/ThyroidAI : Läkarteamet"]
+	path = Customer_Projects/ThyroidAI : Läkarteamet
+	url = https://github.com/aiupscaleagency-max/ThyroidAI.git
+[submodule "Customer_Projects/Af-SIUS"]
+	path = Customer_Projects/Af-SIUS
+	url = https://github.com/aiupscaleagency-max/arbetsformedlingen-ai.git
+[submodule "Customer_Projects/Graphify- Mall-AI-OS"]
+	path = Customer_Projects/Graphify- Mall-AI-OS
+	url = https://github.com/aiupscaleagency-max/graphify-mall-ai-os.git
+[submodule "Customer_Projects/Paperclips Orchestration System"]
+	path = Customer_Projects/Paperclips Orchestration System
+	url = https://github.com/aiupscaleagency-max/paperclip.git
+[submodule "Customer_Projects/Infrea-Insight"]
+	path = Customer_Projects/Infrea-Insight
+	url = https://github.com/aiupscaleagency-max/infrea-insight.git
+[submodule "Customer_Projects/CEO with ADHD/ceo-with-adhd"]
+	path = Customer_Projects/CEO with ADHD/ceo-with-adhd
+	url = https://github.com/aiupscaleagency-max/ceo-with-adhd.git

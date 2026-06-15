@@ -1,0 +1,302 @@
+{
+    "name": "LEAD_Scoring_v1",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "lead-scoring",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Webhook: Inkommande lead",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                200,
+                300
+            ],
+            "notes": "Tar emot lead-data via POST. Kan anropas från LinkedIn Outreach-workflowet, Make.com eller manuellt via API."
+        },
+        {
+            "parameters": {
+                "operation": "search",
+                "application": "={{$env.AIRTABLE_BASE_ID}}",
+                "table": "Leads",
+                "filterByFormula": "AND({Email}='{{$json.email}}', {ICP_Match}='')",
+                "maxRecords": 1
+            },
+            "id": "airtable-check-existing",
+            "name": "Airtable: Kolla existerande lead",
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2,
+            "position": [
+                420,
+                300
+            ],
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "airtable-cred",
+                    "name": "Airtable API"
+                }
+            },
+            "notes": "Kontrollerar om lead redan finns i databasen och undviker dubbelscoring."
+        },
+        {
+            "parameters": {
+                "model": "claude-3-5-sonnet-20241022",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "Du är en expert på B2B-försäljning och ICP-analys för AI Upscale Agency.\n\nVår ICP (Ideal Customer Profile):\n- Roll: VD, COO, Grundare, Partner\n- Företagsstorlek: 5-50 anställda\n- Bransch: SaaS, konsult, rekrytering, fastighet\n- Geografi: Sverige, Norge\n- Smärtpunkt: Vill skala utan att anställa, vill automatisera manuella processer\n- Budget: Kan köpa tjänster för 14 900-69 900 kr/mån\n\nVåra produkter:\n- Starter Workforce: 14 900 kr/mån (2-3 AI-agenter)\n- Growth Workforce: 34 900 kr/mån (5-8 AI-agenter + integrations)\n- Full AI OS: 69 900 kr/mån (komplett AI-operativsystem)\n\nDin uppgift: Ge en ICP-score 0-100 och förslag på rätt produkt.\n\nSvara ENBART med valid JSON i detta format:\n{\n  \"icp_score\": 85,\n  \"rollmatch\": true,\n  \"branschematch\": true,\n  \"storleksmatch\": true,\n  \"geografimatch\": true,\n  \"rekommenderad_produkt\": \"Growth Workforce\",\n  \"motivering\": \"Kort motivering på svenska (max 2 meningar)\",\n  \"nasta_steg\": \"Skicka kontaktförfrågan LinkedIn\"\n}"
+                        },
+                        {
+                            "role": "user",
+                            "content": "Scora detta lead:\nNamn: {{$('Webhook: Inkommande lead').item.json.namn}}\nTitel: {{$('Webhook: Inkommande lead').item.json.titel}}\nFöretag: {{$('Webhook: Inkommande lead').item.json.foretag}}\nBransch: {{$('Webhook: Inkommande lead').item.json.bransch}}\nAntal anställda: {{$('Webhook: Inkommande lead').item.json.antal_anstallda}}\nLand: {{$('Webhook: Inkommande lead').item.json.land}}\nLinkedIn: {{$('Webhook: Inkommande lead').item.json.linkedin_url}}\nKälla: {{$('Webhook: Inkommande lead').item.json.kalla}}"
+                        }
+                    ]
+                },
+                "options": {
+                    "maxTokens": 400,
+                    "temperature": 0.2
+                }
+            },
+            "id": "claude-score",
+            "name": "Claude AI: ICP-scoring",
+            "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.2,
+            "position": [
+                640,
+                300
+            ],
+            "credentials": {
+                "anthropicApi": {
+                    "id": "anthropic-cred",
+                    "name": "Anthropic API"
+                }
+            },
+            "notes": "Claude analyserar lead-data mot ICP-kriterierna och returnerar en score 0-100 samt rekommenderad produkt och nästa steg."
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "// Parsar Claude AI:s JSON-svar säkert\ntry {\n  const text = $input.item.json.text;\n  // Extrahera JSON från svaret\n  const jsonMatch = text.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('Inget JSON hittades i AI-svaret');\n  \n  const scoring = JSON.parse(jsonMatch[0]);\n  \n  return {\n    json: {\n      ...scoring,\n      lead_data: $('Webhook: Inkommande lead').item.json,\n      scored_at: new Date().toISOString()\n    }\n  };\n} catch (error) {\n  throw new Error(`Fel vid JSON-parsning av AI-svar: ${error.message}`);\n}"
+            },
+            "id": "parse-score",
+            "name": "Parsa AI-scoring",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                860,
+                300
+            ],
+            "notes": "Parsar Claude:s JSON-svar och extraherar score, motivering och nästa steg. Kastar fel om svaret är ogiltigt."
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "combinator": "and"
+                    },
+                    "conditions": [
+                        {
+                            "leftValue": "={{$json.icp_score}}",
+                            "rightValue": 60,
+                            "operator": {
+                                "type": "number",
+                                "operation": "gte"
+                            }
+                        }
+                    ]
+                }
+            },
+            "id": "filter-highscore",
+            "name": "Filter: Score ≥ 60?",
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2,
+            "position": [
+                1080,
+                300
+            ],
+            "notes": "Leads med score under 60 sparas men triggar ingen automatisk outreach. Leads ≥60 går vidare till Airtable och LinkedIn-workflowet."
+        },
+        {
+            "parameters": {
+                "operation": "create",
+                "application": "={{$env.AIRTABLE_BASE_ID}}",
+                "table": "Leads",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "Namn": "={{$json.lead_data.namn}}",
+                        "Titel": "={{$json.lead_data.titel}}",
+                        "Foretag": "={{$json.lead_data.foretag}}",
+                        "Bransch": "={{$json.lead_data.bransch}}",
+                        "Antal_Anstallda": "={{$json.lead_data.antal_anstallda}}",
+                        "Land": "={{$json.lead_data.land}}",
+                        "LinkedIn_URL": "={{$json.lead_data.linkedin_url}}",
+                        "Kalla": "={{$json.lead_data.kalla}}",
+                        "ICP_Match": "={{$json.icp_score}}",
+                        "Rekommenderad_Produkt": "={{$json.rekommenderad_produkt}}",
+                        "AI_Motivering": "={{$json.motivering}}",
+                        "Nasta_Steg": "={{$json.nasta_steg}}",
+                        "Status": "Kall",
+                        "LinkedIn_Sent": false,
+                        "Skapad_Datum": "={{$now.toISO()}}"
+                    }
+                }
+            },
+            "id": "airtable-save-lead",
+            "name": "Airtable: Spara scorat lead",
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2,
+            "position": [
+                1300,
+                300
+            ],
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "airtable-cred",
+                    "name": "Airtable API"
+                }
+            },
+            "notes": "Sparar det scorade leadet med full ICP-data, rekommenderad produkt och AI-motivering."
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={\n  \"success\": true,\n  \"lead\": \"{{$json.lead_data.namn}}\",\n  \"icp_score\": {{$json.icp_score}},\n  \"rekommenderad_produkt\": \"{{$json.rekommenderad_produkt}}\",\n  \"nasta_steg\": \"{{$json.nasta_steg}}\",\n  \"airtable_id\": \"{{$json.id}}\"\n}"
+            },
+            "id": "webhook-response",
+            "name": "Webhook: Svara med scoring",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                1520,
+                300
+            ],
+            "notes": "Returnerar scoring-resultat direkt till anroparen (t.ex. Make.com eller frontend)."
+        },
+        {
+            "parameters": {
+                "fromEmail": "aiupscaleagency@gmail.com",
+                "toEmail": "aiupscaleagency@gmail.com",
+                "subject": "⚠️ AIOS Alert: Lead Scoring-fel",
+                "emailType": "text",
+                "message": "Fel i Lead Scoring-workflowet.\n\nFel: {{$json.error.message}}\nLead-data: {{$json.lead_data}}\nTidpunkt: {{$now.toISO()}}\n\nKontrollera n8n: https://72.60.36.92"
+            },
+            "id": "error-handler",
+            "name": "Error Alert: Skicka e-post",
+            "type": "n8n-nodes-base.gmail",
+            "typeVersion": 2.1,
+            "position": [
+                860,
+                520
+            ],
+            "credentials": {
+                "gmailOAuth2": {
+                    "id": "gmail-cred",
+                    "name": "Gmail OAuth"
+                }
+            },
+            "notes": "Fångar upp fel i hela workflowet och skickar e-postvarning."
+        }
+    ],
+    "connections": {
+        "Webhook: Inkommande lead": {
+            "main": [
+                [
+                    {
+                        "node": "Airtable: Kolla existerande lead",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Airtable: Kolla existerande lead": {
+            "main": [
+                [
+                    {
+                        "node": "Claude AI: ICP-scoring",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Claude AI: ICP-scoring": {
+            "main": [
+                [
+                    {
+                        "node": "Parsa AI-scoring",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parsa AI-scoring": {
+            "main": [
+                [
+                    {
+                        "node": "Filter: Score ≥ 60?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter: Score ≥ 60?": {
+            "main": [
+                [
+                    {
+                        "node": "Airtable: Spara scorat lead",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Airtable: Spara scorat lead": {
+            "main": [
+                [
+                    {
+                        "node": "Webhook: Svara med scoring",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Claude AI: ICP-scoring": {
+            "error": [
+                [
+                    {
+                        "node": "Error Alert: Skicka e-post",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "settings": {
+        "executionOrder": "v1",
+        "timezone": "Europe/Stockholm",
+        "maxParallelRuns": 5,
+        "callerPolicy": "any"
+    },
+    "staticData": null,
+    "tags": [
+        "lead-scoring",
+        "icp",
+        "claude",
+        "aios"
+    ],
+    "triggerCount": 1,
+    "updatedAt": "2026-03-24T10:00:00.000Z",
+    "versionId": "v1"
+}

@@ -1,0 +1,206 @@
+{
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/tailwind.config.js": {
+    "mtime": 1777229804.0,
+    "hash": "fe2fed37ed22d8e95163e996c5717665"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/vite.config.js": {
+    "mtime": 1777225657.0,
+    "hash": "f72515cc59ad6032b3d443416ef738eb"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/eslint.config.js": {
+    "mtime": 1777221917.0,
+    "hash": "3aa4b57d7f08181d86bde52a4dcb7f22"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/postcss.config.js": {
+    "mtime": 1777222109.0,
+    "hash": "ef3ba2a81ba19f8ea5ddf625521e96f0"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/main.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "064a2943409035405053a593b608d2b2"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/App.jsx": {
+    "mtime": 1777918343.0,
+    "hash": "95826e093ea761de9b59832cce0b2c21"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/SubVyer.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "8bd26ebd4d4a27b8316965242735dc71"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/BranchIcon.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "a95754f58c9715ed3945b1bf32e7b4c5"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/KommunVyer.jsx": {
+    "mtime": 1777234658.0,
+    "hash": "ab70c9854f939d3190c382274c1ce5fe"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/StatusBadge.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "a9be9c5014ca4a52a5013889746dba9d"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/ProjectMap.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "baf74309379c764d8499cba21c713871"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/ProjektLivePanel.jsx": {
+    "mtime": 1777233439.0,
+    "hash": "7b5b6814f0f8a43a1fe074e3339fed7b"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/AdminVyer.jsx": {
+    "mtime": 1777234737.0,
+    "hash": "1d2124e531373dded6bb7bcd0d55f924"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/Toast.jsx": {
+    "mtime": 1777227746.0,
+    "hash": "daa23513a59c6ea69e7a74d8f79c0481"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/RouteMap.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "2697a78923bf59d3b2752a140feb5239"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/Chatbot.jsx": {
+    "mtime": 1777918882.0,
+    "hash": "ffcbaf2b7582810fc147e73549b55936"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/Sidebar.jsx": {
+    "mtime": 1777234768.0,
+    "hash": "63364e5b7e9603aa4d87c4da35358f59"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/KommunMap.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "4de08b29a9fed2cc9388dee56524eef7"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/LivePanel.jsx": {
+    "mtime": 1777233402.0,
+    "hash": "6fecc92bef2de0e81165d7ece20553db"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/Directions.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "03b02ef9ff6de8b32840fd3a7162bdb4"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/KpiCard.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "b856705995a78b0dba9ce18813992ce7"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/Navbar.jsx": {
+    "mtime": 1777231051.0,
+    "hash": "45ac4a9d9b81aee0c3f1d8d5d1998c14"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/ProjektDetaljModal.jsx": {
+    "mtime": 1777233813.0,
+    "hash": "fdc4b73fd0674fb26a818352b5ca83ae"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/components/SnabbFormul\u00e4r.jsx": {
+    "mtime": 1777918527.0,
+    "hash": "e7d9f3cc6c0f31f3ae621c45480595ff"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/materials.js": {
+    "mtime": 1777222443.0,
+    "hash": "dc4ed407cd38947d3c5c060cb8c35fbf"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/diary.js": {
+    "mtime": 1777222512.0,
+    "hash": "ccad1b786303cb342c949eb508647e08"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/certifikat.js": {
+    "mtime": 1777234554.0,
+    "hash": "3891fd08a5e0adddbc7487092c23d5ee"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/anbud.js": {
+    "mtime": 1777234474.0,
+    "hash": "4f4d8ea778eb10b3711c8aa3952e2847"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/ritningar.js": {
+    "mtime": 1777233366.0,
+    "hash": "fb55fee4218f19cb91c74fc78c9c7d4d"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/ata.js": {
+    "mtime": 1777233319.0,
+    "hash": "0d9856b33c0b2fcff30be1a000cd3818"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/projects.js": {
+    "mtime": 1777229748.0,
+    "hash": "006353d2d7fd7fda298e20b7d1b43015"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/companies.js": {
+    "mtime": 1777228651.0,
+    "hash": "21ba10fdc22666cdf3ad30764db33ebf"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/koncern.js": {
+    "mtime": 1777234525.0,
+    "hash": "6f2c3a75fef2138ae1e91efc8ee6c413"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/invoices.js": {
+    "mtime": 1777229790.0,
+    "hash": "6cd1317e63733f29d6370ecaaeb0f1a8"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/routes.js": {
+    "mtime": 1777222479.0,
+    "hash": "3e711b2667a63cf86d16315d9b66ad4d"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/betyg.js": {
+    "mtime": 1777234503.0,
+    "hash": "5cddeb53e1274816c391170a81b6d7e5"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/data/granskning.js": {
+    "mtime": 1777234575.0,
+    "hash": "72d5a16c7c64b4a97d8ae3a25c90aae8"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/views/FakturaVy.jsx": {
+    "mtime": 1777230322.0,
+    "hash": "08a77cca32fa42f66bf7125d33b99de9"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/views/AdminPanel.jsx": {
+    "mtime": 1777234785.0,
+    "hash": "e395f4503b9f7bc94a1f73b6e7fbc779"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/views/HantverkarVy.jsx": {
+    "mtime": 1777918486.0,
+    "hash": "0199d12f969ebad8bfd74d1dfd9bf6f4"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/views/KommunPortal.jsx": {
+    "mtime": 1777234801.0,
+    "hash": "4cd18329dbbb3da28c70ed3171c5e65f"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/services/routing.js": {
+    "mtime": 1777224396.0,
+    "hash": "358265254f7172029465cd526509513c"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/index.html": {
+    "mtime": 1777221917.0,
+    "hash": "c54bab52971314cba60871962a4592ef"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/LANSERING.md": {
+    "mtime": 1777896805.0,
+    "hash": "93e1c78c4c2a336cedef6f633bdf115d"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/README.md": {
+    "mtime": 1777221917.0,
+    "hash": "a28dc4cb878325f3e9e5649f3e1469ac"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/CLAUDE.md": {
+    "mtime": 1779270265.956954,
+    "hash": "da79aa9343cd2b362206f03762160abc"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/public/icons.svg": {
+    "mtime": 1777221917.0,
+    "hash": "3b4fcfcf393eca4d264dca4a4663bc37"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/public/favicon.svg": {
+    "mtime": 1777221917.0,
+    "hash": "7e840862161341271697daa99a40d76b"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/assets/hero.png": {
+    "mtime": 1777221917.0,
+    "hash": "aead493361b27e7510691c5d7072dfc1"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/assets/vite.svg": {
+    "mtime": 1777221917.0,
+    "hash": "9960a24288958394ac50e57ff638b036"
+  },
+  "/Users/mikaelluengojohansson/ai_upscale_work/Customer_Projects/ByggFlow-BACKUP-20260506-124754/src/assets/react.svg": {
+    "mtime": 1777221917.0,
+    "hash": "f0402b67b6ce880f65666bb49e841696"
+  }
+}

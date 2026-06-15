@@ -1,0 +1,167 @@
+# AI Upscale Agency — Claude Code Master (Mike's AIOS)
+
+## Vem jag är
+Mikael Luengo Johansson (Mike), grundare av **AI Upscale Agency** (aiupscaleagency.com).
+Göteborg, Sverige. aiupscaleagency@gmail.com · mikael@aiupscaleagency.com
+Solo-entreprenör. 100% AI-agent-drivet. Inga anställda.
+**ADHD** — KORTA, KONKRETA svar. Max 5 punkter per svar.
+
+---
+
+## Nordstjärnan (oförhandlingsbar)
+| Milstolpe | Datum |
+|-----------|-------|
+| **Pensionera mamma** | 1/6-2026 |
+| 15 high-ticket försäljningar per dag | 2026 |
+| 35,9 MSEK försäljning + 108,9 MSEK intäkter | 2026 |
+| **1 MILJARD KR ARR** (rekord för 1-man business) | 1/9-2027 |
+| 1000st AI Agenter & AIOS i drift 24/7 | 2027+ |
+
+---
+
+## Företagsstruktur
+
+```
+AI UPSCALE AGENCY (Holdingbolag)
+├── AIOS — eget AI Operating System (B2B workforce-paket)
+│
+├── ThyroidAI Clinic (Dotterbolag — B2C hälsa)
+│   ├── Live: app.thyroidaiclinic.com
+│   ├── 7 AI-läkarteam, Stripe LIVE
+│   └── Mål: 150 MSEK/år (alla 21 regioner)
+│
+└── CEO with ADHD (Dotterbolag — B2C kurs + coaching)
+    ├── 4 Tiers (videokurs → coaching-app)
+    └── Mål: 100 MSEK/år
+```
+
+---
+
+## Aktiv tech stack (Master 3.0 — 2026-05-11)
+
+### Kärna
+| Verktyg | Roll |
+|---------|------|
+| **Docker (lokalt)** | Kör och observerar allt i realtid — siffror, loggar, möjligheter |
+| **OpenClaw** | Agent-runtime, multi-agent ("anställa flera vid behov"), inbyggt dashboard |
+| **Claude Code** | Bygger agenter, skills, infrastruktur (Opus 4.7, 1M context) |
+| **Claude API** | Frontier AI-hjärna i agenter |
+| **Gemini** | YouTube + andra AI-verktyg |
+| **Perplexity** | Research |
+| **Supabase + pgvector** | Databas, RAG, patient-data, användare |
+
+### Stödjande
+| Verktyg | Roll |
+|---------|------|
+| Stripe | Betalning (alla produkter) |
+| HubSpot (free) | CRM för B2B-leads |
+| Google Workspace + Drive | Mail, dokument, fil-lagring |
+| NotebookLM | Podcast-skapare + dokument-analys |
+| Telegram | Daglig brief, intern kommunikation |
+| Vercel | Web deployment |
+| Hostinger VPS (76.13.149.231) | ThyroidAI Docker-host |
+
+### Vad vi INTE använder (lärdom)
+| Verktyg | Anledning |
+|---------|-----------|
+| **n8n** | För mycket nodes-strul, aldrig riktigt körts skarpt |
+| **Paperclip** | LLM-strul + RAM-tungt på Hostinger, avinstallerat |
+| Make.com, Phantombuster, Fortnox, Airtable | Ersatta eller onödiga |
+
+---
+
+## AI Upscale — B2B AIOS Workforce-paket
+
+| Paket | Pris | Innehåll |
+|-------|------|---------|
+| Tripwire Agent | 1 490–2 490 kr | 1 skräddarsydd agent → upsell |
+| Starter Workforce | 14 900 kr/mån | Litet agent-team, gratis LLMs |
+| Growth Workforce | 34 900 kr/mån | Utökat team + custom skills + QA-agent |
+| Full AI OS | 69 900 kr/mån | Komplett OpenClaw-företag med CEO-agent, routines, eval |
+
+**ICP:** VD/COO/Grundare, 5–50 anställda, SaaS/konsult/rekrytering/fastighet/byråer, Sverige+Norge.
+
+**Säljstrategi — Familiarity-loop:**
+`Like → Comment → Connect → DM → Call → Offert <4h → Onboarding`
+Kalla mail: 2–3% konvertering. Efter familiarity: 15–30%.
+
+---
+
+## Aktiva projekt (prioritetsordning)
+
+1. **OpenClaw Recruiter / Sales / Co-Pilot agent** — flexibel meta-agent som värvar och bygger team av andra agenter on demand. Mike's första riktiga OpenClaw-agent. (PÅGÅR)
+2. **ThyroidAI** — LIVE på app.thyroidaiclinic.com. Docker VPS 76.13.149.231. 7 multi-agent system. Capacitor iOS/Android, Stripe live, Affiliate, PostHog, sv/en/es.
+3. **Fluentic AI** — Språkapp (es/en/fr/ar). Next.js 15 + Gemini 2.5 Flash. Vercel alpha. Lokalt port 3010.
+4. **CEO with ADHD kurs** — PDF + verktyg klart. Video EJ inspelad. Material i Google Drive.
+5. **Content & Media Factory** — Koncept tabled. Byggs som OpenClaw-agenter när tid finns.
+
+### Potentiella kunder (väntar)
+- **Cluee News** (Mikael Hallstr, 247K YT subs) — 20–40 min nyhetsvideos + shorts
+- **Cali Kingz Coffee** (Thailand) — IG/TikTok reels, produktbilder
+
+---
+
+## Mappstruktur
+
+```
+~/ai_upscale_work/                    — HUVUDMAPP
+├── CLAUDE.md                         — DENNA FIL (master-referens)
+├── knowledge/                        — Strategisk data (djupdykning per ämne)
+│   ├── 01_vision_and_goals.md
+│   ├── 02_business_structure.md
+│   ├── 03_products_and_pricing.md
+│   ├── 04_tech_stack.md
+│   ├── 05_sales_playbook.md
+│   ├── 06_apps_and_projects.md
+│   └── 07_lessons_learned.md
+├── Customer_Projects/
+│   └── ThyroidAI : Läkarteamet/      — ThyroidAI Next.js app
+├── fluentic-ai/                      — Språkapp
+├── AIOS_Core/                        — AI Upscale's egna AIOS (uppdateras)
+├── AIOS_Core_landing/                — Landningssida
+├── CEO-with-ADHD.md                  — Kurs-master
+├── Content-Media-Team.md             — Factory-koncept
+└── content-templates/                — Content-mallar
+```
+
+---
+
+## Hur du jobbar med mig (regler för Claude)
+
+1. **Plan först** — vänta på OK → sedan kör (Plan Mode: Shift+Tab x2)
+2. **Max 5 punkter per svar** (ADHD-anpassat)
+3. **Kommentera kod på svenska**
+4. **ALLTID git commit + push** efter ändringar — jag vill kunna rolla tillbaka
+5. **Fråga ALLTID innan LLM-byte** — visa exakta priser
+6. **Lyssna noga första gången** — jag repeterar inte gärna infrastruktur/domän-detaljer
+7. **Karpathy-principer**: kirurgiska ändringar, inga tysta antaganden, ingen överkomplikation
+8. **Prioritera: ROI > Momentum > Perfektion**
+9. **Fråga hellre än att gissa**
+10. **Aldrig** föreslå n8n eller Paperclip utan explicit OK från mig
+
+---
+
+## Systemroller (för Claude)
+`[STRATEG]` — Affärsstrategi, positionering, prissättning
+`[KODARE]` — App-utveckling, agent-config, integrations
+`[SÄLJCOACH]` — LinkedIn outreach, familiarity-loop, scripts
+`[CONTENT]` — Kurs-content, podcasts, thought leadership
+`[PLANERARE]` — Milstolpar, roadmaps, sprintar
+`[SOP-SKRIVARE]` — Processer, templates, automationer
+
+---
+
+## De 9 kärnprinciperna (aldrig förhandlingsbara)
+1. **80/20** — 80% av resultaten från 20% av handlingarna
+2. **ROI före allt** — motiveras i tid, pengar eller energi, annars bort
+3. **Momentum > Perfektion** — bygg snabbt, testa, förbättra
+4. **System före människor** — automatisera INNAN du anställer
+5. **Tydlighet = makt** — 30 sekunder eller mindre, annars för komplicerat
+6. **Tid är kapital** — skydda Mikes tid som mest värdefull resurs
+7. **Data är sanning** — fakta, inte känsla
+8. **Frihet som mål** — varje system → ett liv i frihet
+9. **Skala utan friktion** — bygg för 100 kunder, inte 5
+
+---
+
+**Detaljer:** se `~/ai_upscale_work/knowledge/`

@@ -1,0 +1,194 @@
+{
+  "main": {
+    "id": "e6edb86ce342cfc1",
+    "type": "split",
+    "children": [
+      {
+        "id": "369bba77a4894c35",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "59ad5174d7d92cd3",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "AI-Upscale-Brain/graph.canvas",
+                "viewState": {
+                  "x": 21742.16,
+                  "y": 8774.64,
+                  "zoom": -4
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "graph"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "493bca9a32241686",
+    "type": "split",
+    "children": [
+      {
+        "id": "4355aaa67897bc36",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "32db1d62cc2aedb7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Filutforskare"
+            }
+          },
+          {
+            "id": "ffc37f455537dab2",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Sök"
+            }
+          },
+          {
+            "id": "fc000a5bae6615a2",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bokmärken"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "116e0bbebe235644",
+    "type": "split",
+    "children": [
+      {
+        "id": "a48d04ccaff13812",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8445a5c7e5fc2495",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "AI-Upscale-Brain/graph.canvas",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Bakåtlänkar för graph"
+            }
+          },
+          {
+            "id": "6be313dca5832f70",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "AI-Upscale-Brain/graph.canvas",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Utgående länkar från graph"
+            }
+          },
+          {
+            "id": "c25f0c8c50a440d8",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Taggar"
+            }
+          },
+          {
+            "id": "36f83a6520779769",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Alla egenskaper"
+            }
+          },
+          {
+            "id": "013cb089aa68f37c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "AI-Upscale-Brain/graph.canvas",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Disposition av graph"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Öppna snabbväxlare": false,
+      "graph:Öppna grafvy": false,
+      "canvas:Skapa ny canvas": false,
+      "daily-notes:Öppna dagens anteckning": false,
+      "templates:Infoga mall": false,
+      "command-palette:Öppna kommandopalett": false,
+      "bases:Skapa ny bas": false
+    }
+  },
+  "active": "32db1d62cc2aedb7",
+  "lastOpenFiles": [
+    "AI-Upscale-Brain/00-INDEX.md",
+    "AI-Upscale-Brain/graph.canvas"
+  ]
+}

@@ -1,0 +1,477 @@
+{
+    "name": "LINKEDIN_OutreachSequence_v1",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 8 * * 1-5"
+                        }
+                    ]
+                }
+            },
+            "id": "trigger-schedule",
+            "name": "Trigger: Vardag 08:00",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                200,
+                300
+            ],
+            "notes": "Kör varje vardag klockan 08:00. Kan även triggas manuellt via webhook."
+        },
+        {
+            "parameters": {
+                "operation": "search",
+                "application": "{{$env.AIRTABLE_BASE_ID}}",
+                "table": "Leads",
+                "filterByFormula": "AND({Status}='Kall', {ICP_Match}>=70, {LinkedIn_Sent}=FALSE())",
+                "maxRecords": 10,
+                "fields": [
+                    "Namn",
+                    "Titel",
+                    "Foretag",
+                    "Bransch",
+                    "LinkedIn_URL",
+                    "Antal_Anstallda",
+                    "Land",
+                    "ICP_Match",
+                    "Anteckningar"
+                ]
+            },
+            "id": "airtable-get-leads",
+            "name": "Airtable: Hämta ICP-leads",
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2,
+            "position": [
+                420,
+                300
+            ],
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "airtable-cred",
+                    "name": "Airtable API"
+                }
+            },
+            "notes": "Hämtar max 10 outreach-leads per körning. ICP: VD/COO/Grundare, 5-50 anst, SaaS/konsult/rekrytering/fastighet, Sverige+Norge."
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "combinator": "and"
+                    },
+                    "conditions": [
+                        {
+                            "leftValue": "={{$json.Antal_Anstallda}}",
+                            "rightValue": 5,
+                            "operator": {
+                                "type": "number",
+                                "operation": "gte"
+                            }
+                        },
+                        {
+                            "leftValue": "={{$json.Antal_Anstallda}}",
+                            "rightValue": 50,
+                            "operator": {
+                                "type": "number",
+                                "operation": "lte"
+                            }
+                        }
+                    ]
+                }
+            },
+            "id": "filter-icp",
+            "name": "Filter: Validera ICP",
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2,
+            "position": [
+                640,
+                300
+            ],
+            "notes": "Säkerhetskoll — säkerställer att lead matchar ICP (5-50 anst) innan AI-personalisering."
+        },
+        {
+            "parameters": {
+                "model": "claude-3-5-sonnet-20241022",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "Du är en expert på B2B-försäljning och LinkedIn-outreach för AI-automatiseringstjänster. Din uppgift är att skriva ett kortfattat, personaliserat LinkedIn-kontaktmeddelande (max 300 tecken) på svenska till en beslutsfattare.\n\nRegler:\n- Inga generiska fraser ('Hoppas du mår bra')\n- Referera specifikt till deras bransch eller roll\n- En tydlig nytta med AI-automatisering för deras typ av företag\n- Avsluta alltid med en öppen fråga\n- Signera: Mike | AI Upscale Agency\n- ALDRIG ljuga eller överdriva\n\nDu svarar ENBART med meddelandet, inget annat."
+                        },
+                        {
+                            "role": "user",
+                            "content": "Skriv ett LinkedIn-kontaktmeddelande till:\nNamn: {{$json.Namn}}\nTitel: {{$json.Titel}}\nFöretag: {{$json.Foretag}}\nBransch: {{$json.Bransch}}\nAntal anställda: {{$json.Antal_Anstallda}}\nLand: {{$json.Land}}\nExtra info: {{$json.Anteckningar}}"
+                        }
+                    ]
+                },
+                "options": {
+                    "maxTokens": 200,
+                    "temperature": 0.7
+                }
+            },
+            "id": "claude-personalize",
+            "name": "Claude AI: Personalisera meddelande",
+            "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.2,
+            "position": [
+                860,
+                300
+            ],
+            "credentials": {
+                "anthropicApi": {
+                    "id": "anthropic-cred",
+                    "name": "Anthropic API"
+                }
+            },
+            "notes": "Claude Sonnet genererar ett unikt, personaliserat kontaktmeddelande per lead baserat på roll, bransch och företagsstorlek."
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "application": "={{$env.AIRTABLE_BASE_ID}}",
+                "table": "Leads",
+                "id": "={{$('Airtable: Hämta ICP-leads').item.json.id}}",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "Status": "Kontaktad",
+                        "LinkedIn_Sent": true,
+                        "LinkedIn_Meddelande": "={{$json.text}}",
+                        "LinkedIn_Skickat_Datum": "={{$now.toISO()}}",
+                        "Familiarity_Steg": "1_Kontaktad"
+                    }
+                }
+            },
+            "id": "airtable-update-lead",
+            "name": "Airtable: Uppdatera lead-status",
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2,
+            "position": [
+                1080,
+                300
+            ],
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "airtable-cred",
+                    "name": "Airtable API"
+                }
+            },
+            "notes": "Markerar lead som 'Kontaktad' och sparar det personaliserade meddelandet (för uppföljning och A/B-analys)."
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.hubapi.com/crm/v3/objects/contacts",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "options": {
+                    "response": {
+                        "response": {
+                            "fullResponse": false
+                        }
+                    }
+                },
+                "body": {
+                    "contentType": "json",
+                    "body": {
+                        "properties": {
+                            "firstname": "={{$('Airtable: Hämta ICP-leads').item.json.Namn.split(' ')[0]}}",
+                            "lastname": "={{$('Airtable: Hämta ICP-leads').item.json.Namn.split(' ').slice(1).join(' ')}}",
+                            "company": "={{$('Airtable: Hämta ICP-leads').item.json.Foretag}}",
+                            "jobtitle": "={{$('Airtable: Hämta ICP-leads').item.json.Titel}}",
+                            "hs_lead_status": "NEW",
+                            "lifecyclestage": "lead",
+                            "linkedin_bio": "={{$('Airtable: Hämta ICP-leads').item.json.LinkedIn_URL}}"
+                        }
+                    }
+                }
+            },
+            "id": "hubspot-create-contact",
+            "name": "HubSpot: Skapa/uppdatera kontakt",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1080,
+                480
+            ],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "hubspot-cred",
+                    "name": "HubSpot API Key"
+                }
+            },
+            "notes": "Skapar kontakt i HubSpot CRM och sätter lifecycle stage till 'lead'. Undviker dubletter via upsert-logik.",
+            "onError": "continueErrorOutput"
+        },
+        {
+            "parameters": {
+                "amount": 3,
+                "unit": "days"
+            },
+            "id": "wait-followup-1",
+            "name": "Vänta 3 dagar",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                1300,
+                300
+            ],
+            "notes": "Familiarity Loop Steg 2: Väntar 3 dagar innan uppföljningsmeddelande 1."
+        },
+        {
+            "parameters": {
+                "model": "claude-3-5-sonnet-20241022",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "Du skriver ett kortfattat uppföljningsmeddelande (max 200 tecken) på svenska för LinkedIn. Ton: vänlig, inte desperat. Referera till det tidigare meddelandet. Fråga om de har haft tid att tänka på det. ENBART meddelandet som svar."
+                        },
+                        {
+                            "role": "user",
+                            "content": "Uppföljning till {{$('Airtable: Hämta ICP-leads').item.json.Namn}} ({{$('Airtable: Hämta ICP-leads').item.json.Titel}} på {{$('Airtable: Hämta ICP-leads').item.json.Foretag}}).\nUrsprungligt meddelande: {{$('Airtable: Hämta ICP-leads').item.json.LinkedIn_Meddelande}}"
+                        }
+                    ]
+                },
+                "options": {
+                    "maxTokens": 150,
+                    "temperature": 0.6
+                }
+            },
+            "id": "claude-followup-1",
+            "name": "Claude AI: Uppföljning 1",
+            "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+            "typeVersion": 1.2,
+            "position": [
+                1520,
+                300
+            ],
+            "credentials": {
+                "anthropicApi": {
+                    "id": "anthropic-cred",
+                    "name": "Anthropic API"
+                }
+            },
+            "notes": "Genererar Familiarity Loop uppföljning 1 — mjuk påminnelse efter 3 dagar."
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "application": "={{$env.AIRTABLE_BASE_ID}}",
+                "table": "Leads",
+                "id": "={{$('Airtable: Hämta ICP-leads').item.json.id}}",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "Familiarity_Steg": "2_Uppfoljning1",
+                        "Uppfoljning1_Datum": "={{$now.toISO()}}"
+                    }
+                }
+            },
+            "id": "airtable-update-followup1",
+            "name": "Airtable: Logga uppföljning 1",
+            "type": "n8n-nodes-base.airtable",
+            "typeVersion": 2,
+            "position": [
+                1740,
+                300
+            ],
+            "credentials": {
+                "airtableTokenApi": {
+                    "id": "airtable-cred",
+                    "name": "Airtable API"
+                }
+            },
+            "notes": "Sparar uppföljningstidpunkt och uppdaterar familiarity loop-steget."
+        },
+        {
+            "parameters": {
+                "fromEmail": "aiupscaleagency@gmail.com",
+                "toEmail": "aiupscaleagency@gmail.com",
+                "subject": "⚠️ AIOS Alert: LinkedIn Outreach-fel",
+                "emailType": "text",
+                "message": "Ett fel uppstod i LinkedIn Outreach-workflowet.\n\nFel: {{$json.error.message}}\nLead: {{$json.Namn}} ({{$json.Foretag}})\nTidpunkt: {{$now.toISO()}}\n\nKontrollera n8n-loggen: https://72.60.36.92"
+            },
+            "id": "error-email",
+            "name": "Error Alert: Skicka e-post",
+            "type": "n8n-nodes-base.gmail",
+            "typeVersion": 2.1,
+            "position": [
+                860,
+                540
+            ],
+            "credentials": {
+                "gmailOAuth2": {
+                    "id": "gmail-cred",
+                    "name": "Gmail OAuth"
+                }
+            },
+            "notes": "Error handling — skickar e-postvarning till Mike om något steg fallerar."
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "name": "workflow_run_id",
+                            "value": "={{$execution.id}}",
+                            "type": "string"
+                        },
+                        {
+                            "name": "leads_processed",
+                            "value": "={{$('Airtable: Hämta ICP-leads').all().length}}",
+                            "type": "number"
+                        },
+                        {
+                            "name": "timestamp",
+                            "value": "={{$now.toISO()}}",
+                            "type": "string"
+                        },
+                        {
+                            "name": "status",
+                            "value": "completed",
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "id": "set-summary",
+            "name": "Sammanställ körningsdata",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.3,
+            "position": [
+                1960,
+                300
+            ],
+            "notes": "Sätter ihop sammanfattning av körningen för loggning och dashboard-visning."
+        }
+    ],
+    "connections": {
+        "Trigger: Vardag 08:00": {
+            "main": [
+                [
+                    {
+                        "node": "Airtable: Hämta ICP-leads",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Airtable: Hämta ICP-leads": {
+            "main": [
+                [
+                    {
+                        "node": "Filter: Validera ICP",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter: Validera ICP": {
+            "main": [
+                [
+                    {
+                        "node": "Claude AI: Personalisera meddelande",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Claude AI: Personalisera meddelande": {
+            "main": [
+                [
+                    {
+                        "node": "Airtable: Uppdatera lead-status",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "HubSpot: Skapa/uppdatera kontakt",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Airtable: Uppdatera lead-status": {
+            "main": [
+                [
+                    {
+                        "node": "Vänta 3 dagar",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Vänta 3 dagar": {
+            "main": [
+                [
+                    {
+                        "node": "Claude AI: Uppföljning 1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Claude AI: Uppföljning 1": {
+            "main": [
+                [
+                    {
+                        "node": "Airtable: Logga uppföljning 1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Airtable: Logga uppföljning 1": {
+            "main": [
+                [
+                    {
+                        "node": "Sammanställ körningsdata",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HubSpot: Skapa/uppdatera kontakt": {
+            "error": [
+                [
+                    {
+                        "node": "Error Alert: Skicka e-post",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "settings": {
+        "executionOrder": "v1",
+        "timezone": "Europe/Stockholm",
+        "errorWorkflow": "",
+        "maxParallelRuns": 1,
+        "callerPolicy": "any"
+    },
+    "staticData": null,
+    "tags": [
+        "linkedin",
+        "outreach",
+        "lead-gen",
+        "aios"
+    ],
+    "triggerCount": 1,
+    "updatedAt": "2026-03-24T10:00:00.000Z",
+    "versionId": "v1"
+}
