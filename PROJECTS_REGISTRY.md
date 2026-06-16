@@ -19,7 +19,7 @@
 
 ---
 
-## Aktiva projekt (16 st)
+## Aktiva projekt (17 st)
 
 | # | Projekt | Lokal path | GitHub (aiupscaleagency-max/) | Status | Roll |
 |---|---|---|---|---|---|
@@ -39,6 +39,7 @@
 | 14 | **caso-chile-dashboard** | `caso-chile-dashboard/` | `caso-chile-dashboard` | ⚪ PERSONLIGT | Eget bruk |
 | 15 | **agent-os** | `agent-os/` | ❌ **SAKNAS** | 🟡 EXPERIMENT | Agent-system (git-only, ej package.json) |
 | 16 | **awesome-claude-design** | `awesome-claude-design/` | (VoltAgent — ej Mikes) | ⚪ KLONAT | Design-bibliotek från VoltAgent |
+| 17 | **cold-call-engine** | `cold-call-engine/` | ❌ **SAKNAS** | 🟡 PÅGÅR | White-label AI cold-calling-motor (Agora + Gemini Live). Första tenant: Arbetsmiljöcenter (agentName "Mikael"). Saknar Agora-konto + Gemini API-nyckel innan live-test. |
 
 ## Pausade / skrotade (3 st)
 
@@ -58,7 +59,7 @@
 
 ---
 
-## 🔴 KRITISKT: Projekt UTAN GitHub-backup (7 st)
+## 🔴 KRITISKT: Projekt UTAN GitHub-backup (8 st)
 
 Om hårddisken kraschar är dessa borta:
 
@@ -69,6 +70,7 @@ Om hårddisken kraschar är dessa borta:
 🟡 ze-parts               ← snart klar
 🟡 Graphify- Mall-AI-OS   ← mall för leveranser
 🟡 agent-os               ← experiment (ej package.json)
+🟡 cold-call-engine       ← nybyggd, Arbetsmiljöcenter white-label engine
 ⚪ Paperclips Orchestration ← skrotat (skippa)
 ```
 
