@@ -8,7 +8,7 @@
 
 | Inställning | Val | Varför |
 |---|---|---|
-| **LLM** | GPT-4o (eller Gemini 2.5 Flash om billigare) | Snabb + bra svenska |
+| **LLM** | Starkare än GPT-4o → GPT-5.x eller Gemini 2.5 Pro | ⚠️ GPT-4o fastnade 8 min på röstbrevlåda i Davids test — använd starkare modell + voicemail-regel nedan |
 | **Voice** | Retells inbyggda svenska röst (testa flera, välj mest naturlig) | Kommersiellt täckt via minutpris — undvik separat ElevenLabs gratis |
 | **Language** | Swedish (sv-SE) | — |
 | **Interruption sensitivity** | Medium-hög | Cold calls = folk avbryter |
@@ -49,6 +49,7 @@ Webbapp för systematiskt arbetsmiljöarbete (SAM). Samlar alla dokument, rutine
 
 # REGLER
 - Prata naturlig, vardaglig svenska. Korta meningar. Låt personen prata.
+- RÖSTBREVLÅDA: om du hör en röstbrevlåda/svarare (ljudsignal, "lämna ett meddelande", ingen riktig dialog) → lägg på direkt, prata inte. Slösa inte tid/krediter.
 - Avsluta ALDRIG utan ett nästa steg (bokad tid, vidarekoppling eller mejl).
 - Lova aldrig exakt pris — säg "3 000–6 000 kr om året, med förhandlingsyta".
 - Om personen är tydligt ointresserad eller ber dig sluta: tacka artigt och avsluta.
