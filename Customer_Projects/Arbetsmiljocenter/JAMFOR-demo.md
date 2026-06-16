@@ -21,8 +21,12 @@
 - **Vald för chefs-demot:** →
 
 ## Röst-val (anteckna vilken du valde)
-- Retell-röst: 
-- Vapi-röst (provider + namn): 
+- Klonad röst (ElevenLabs Voice ID): 
+- Retell — lät klonen naturlig? (1–5): 
+- Vapi — lät klonen naturlig? (1–5): 
+- Ev. fallback-röst om klonen bröt: 
+
+> Tips: testa SAMMA klonade röst i båda (se `ROST-klon-elevenlabs.md`) för rättvis jämförelse.
 
 ## Vad jag (Claude) justerar efter detta
 - Prompt-finslipning baserat på vad som inte följdes
