@@ -5,240 +5,353 @@
 <title>AI Upscale Brain — Memory Galaxy</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#020208; color:#e2e8f0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; overflow:hidden; height:100vh; }
+body { background:#020208; color:#e2e8f0;
+       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+       overflow:hidden; height:100vh; }
 #canvas { width:100vw; height:100vh; }
 
-/* HUD */
-#hud { position:fixed; top:16px; left:16px; z-index:10; display:flex; flex-direction:column; gap:8px; }
-#brand { font-size:11px; color:#4a5568; letter-spacing:2px; text-transform:uppercase; }
-#galaxy-title { font-size:22px; font-weight:700; color:#fff; text-shadow:0 0 30px rgba(200,180,255,0.5); }
-#galaxy-sub { font-size:11px; color:#4a5568; margin-top:2px; }
-#counter { font-size:11px; color:#6b7280; margin-top:4px; }
+#hud { position:fixed; top:16px; left:16px; z-index:10;
+        display:flex; flex-direction:column; gap:6px; pointer-events:none; }
+#brand { font-size:10px; color:#3a3a5a; letter-spacing:2px; text-transform:uppercase; }
+#galaxy-title { font-size:22px; font-weight:700; color:#fff;
+                 text-shadow:0 0 30px rgba(200,180,255,.5); }
+#galaxy-sub { font-size:10px; color:#3a3a5a; margin-top:1px; }
+#counter { font-size:10px; color:#555570; margin-top:2px; }
 #search {
-  background:rgba(10,10,25,0.8); border:1px solid #1a1a3a;
+  pointer-events:all;
+  background:rgba(10,10,25,.85); border:1px solid #1a1a3a;
   border-radius:6px; color:#e2e8f0; padding:5px 10px;
   font-size:11px; width:200px; outline:none; margin-top:4px;
 }
-#search:focus { border-color:rgba(180,160,255,0.5); }
-#legend { margin-top:6px; display:flex; flex-direction:column; gap:3px; }
-.leg { font-size:10px; color:#4a5568; display:flex; align-items:center; gap:5px; }
-.leg-dot { width:6px; height:6px; border-radius:50%; }
+#search:focus { border-color:rgba(180,160,255,.5); }
 
-/* Info-panel */
+#legend { margin-top:6px; display:flex; flex-direction:column; gap:3px; }
+.leg { font-size:9px; color:#4a5568; display:flex; align-items:center; gap:5px; }
+.leg-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.leg-line { width:18px; height:2px; flex-shrink:0; border-radius:1px; }
+.leg-sep { margin-top:3px; border-top:1px solid #0d0d20; padding-top:3px; }
+
+/* Filter-knappar */
+#filters { pointer-events:all; display:flex; gap:4px; flex-wrap:wrap; margin-top:6px; }
+.fbtn {
+  font-size:9px; padding:3px 7px; border-radius:10px; cursor:pointer;
+  border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);
+  color:#6b7280; transition:all .15s;
+}
+.fbtn:hover { color:#e2e8f0; border-color:rgba(255,255,255,.2); }
+.fbtn.active { color:#fff; border-color:currentColor; }
+
+/* Panel */
 #panel {
-  position:fixed; right:0; top:0; bottom:0; width:270px;
-  background:rgba(5,5,15,0.95); border-left:1px solid #0f0f2a;
-  padding:20px 14px; transform:translateX(100%);
-  transition:transform 0.2s ease; z-index:20; overflow-y:auto;
+  position:fixed; right:0; top:0; bottom:0; width:280px;
+  background:rgba(4,4,14,.96); border-left:1px solid #0c0c22;
+  padding:20px 16px; transform:translateX(100%);
+  transition:transform .2s ease; z-index:20; overflow-y:auto;
 }
 #panel.open { transform:translateX(0); }
-#panel-title { font-size:15px; font-weight:700; margin-bottom:4px; }
-#panel-cat { font-size:10px; color:#6b7280; margin-bottom:4px; }
-#panel-recency { font-size:10px; margin-bottom:10px; }
-#panel-path { font-size:9px; color:#374151; word-break:break-all; margin-bottom:12px; }
-#panel-links h3 { font-size:9px; color:#4b5563; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
-.plink { font-size:10px; color:#6b7280; padding:3px 0 3px 7px; cursor:pointer; border-left:1px solid transparent; }
+#panel-badge {
+  display:inline-block; font-size:9px; padding:2px 8px; border-radius:10px;
+  margin-bottom:8px; font-weight:600; letter-spacing:.5px; text-transform:uppercase;
+}
+#panel-title { font-size:16px; font-weight:700; margin-bottom:2px; }
+#panel-status { font-size:10px; color:#6b7280; margin-bottom:8px; }
+#panel-goal { font-size:11px; margin-bottom:10px; }
+.pmeta { font-size:10px; color:#6b7280; margin-bottom:4px; }
+.pmeta strong { color:#9ca3af; }
+#panel-divider { border:none; border-top:1px solid #0f0f22; margin:10px 0; }
+#panel-links h3 {
+  font-size:9px; color:#374151; text-transform:uppercase;
+  letter-spacing:1px; margin-bottom:5px;
+}
+.plink {
+  font-size:10px; color:#6b7280; padding:3px 0 3px 8px;
+  cursor:pointer; border-left:1px solid transparent;
+  transition:color .1s;
+}
 .plink:hover { color:#e2e8f0; }
-#close-btn { position:absolute; top:10px; right:10px; background:none; border:none; color:#374151; font-size:16px; cursor:pointer; }
+#close-btn {
+  position:absolute; top:10px; right:10px;
+  background:none; border:none; color:#374151; font-size:16px; cursor:pointer;
+}
 #close-btn:hover { color:#e2e8f0; }
 
-/* Live-indikator */
-#live { position:fixed; bottom:16px; right:16px; font-size:10px; color:#374151; display:flex; align-items:center; gap:5px; }
-#live-dot { width:5px; height:5px; border-radius:50%; background:#10b981; animation:blink 2s ease-in-out infinite; }
-@keyframes blink { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
+/* Live */
+#live { position:fixed; bottom:14px; right:14px; font-size:9px;
+         color:#374151; display:flex; align-items:center; gap:4px; }
+#live-dot { width:5px; height:5px; border-radius:50%; background:#10b981;
+              animation:blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100% { opacity:.3; } 50% { opacity:1; } }
 </style>
 </head>
 <body>
 <svg id="canvas">
   <defs>
-    <filter id="glow-sm"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="glow-md"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="glow-lg"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-sm"><feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-md"><feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-lg"><feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
 </svg>
 
 <div id="hud">
   <div id="brand">LOCAL · STUDIO</div>
   <div>
-    <div id="galaxy-title">Memory</div>
-    <div id="galaxy-sub">AI Upscale Brain — Obsidian Vault</div>
+    <div id="galaxy-title">AI Upscale Brain</div>
+    <div id="galaxy-sub">Memory Galaxy · Arkitekturöversikt</div>
   </div>
-  <div id="counter">63 stjärnor · 34 kopplingar</div>
-  <input id="search" type="text" placeholder="Sök stjärna..." autocomplete="off"/>
+  <div id="counter">65 noder · 54 kopplingar</div>
+  <input id="search" type="text" placeholder="Sök nod…" autocomplete="off"/>
+  <div id="filters">
+    <button class="fbtn active" data-cat="all">Alla</button>
+    <button class="fbtn" data-cat="b2c" style="color:rgb(100,255,180)">B2C</button>
+    <button class="fbtn" data-cat="b2b" style="color:rgb(120,180,255)">B2B</button>
+    <button class="fbtn" data-cat="platform" style="color:rgb(200,150,255)">Platform</button>
+    <button class="fbtn" data-cat="customer" style="color:rgb(255,160,80)">Kunder</button>
+    <button class="fbtn" data-cat="memory">Memory</button>
+    <button class="fbtn" data-cat="agent">Agents</button>
+  </div>
   <div id="legend">
-    <div class="leg"><span class="leg-dot" style="background:rgb(255,240,180)"></span>hub</div>
-    <div class="leg"><span class="leg-dot" style="background:rgb(180,255,220)"></span>projekt</div>
-    <div class="leg"><span class="leg-dot" style="background:rgb(210,180,255)"></span>memory</div>
-    <div class="leg"><span class="leg-dot" style="background:rgb(150,230,255)"></span>feedback</div>
-    <div class="leg"><span class="leg-dot" style="background:rgb(255,200,150)"></span>agent</div>
-    <div class="leg"><span class="leg-dot" style="background:rgb(180,210,255)"></span>strategi</div>
-    <div class="leg" style="margin-top:4px;color:#374151">ljusare = nyligen rörd</div>
+    <div class="leg leg-sep">
+      <span class="leg-dot" style="background:rgb(255,240,150)"></span>Hub — AI Upscale Brain
+    </div>
+    <div class="leg">
+      <span class="leg-dot" style="background:rgb(100,255,180)"></span>B2C projekt
+    </div>
+    <div class="leg">
+      <span class="leg-dot" style="background:rgb(120,180,255)"></span>B2B / AIOS
+    </div>
+    <div class="leg">
+      <span class="leg-dot" style="background:rgb(200,150,255)"></span>Platform (AIOS Core)
+    </div>
+    <div class="leg">
+      <span class="leg-dot" style="background:rgb(255,160,80)"></span>Kunder & leads
+    </div>
+    <div class="leg">
+      <span class="leg-dot" style="background:rgb(200,160,255)"></span>Memory / kontext
+    </div>
+    <div class="leg">
+      <span class="leg-dot" style="background:rgb(255,200,120)"></span>Agents / skills
+    </div>
+    <div class="leg leg-sep">
+      <span class="leg-line" style="background:rgba(255,240,100,.5)"></span>Hub → projekt
+    </div>
+    <div class="leg">
+      <span class="leg-line" style="background:rgba(255,150,50,.6)"></span>Korskopp. (delad tech/agent)
+    </div>
+    <div class="leg">
+      <span class="leg-line" style="background:rgba(180,100,255,.4)"></span>Memory → projekt
+    </div>
+    <div class="leg" style="margin-top:3px;color:#2d2d40">⬤ ljusare = senast rörd</div>
   </div>
 </div>
 
 <div id="panel">
   <button id="close-btn" onclick="closePanel()">✕</button>
+  <div id="panel-badge"></div>
   <div id="panel-title"></div>
-  <div id="panel-cat"></div>
-  <div id="panel-recency"></div>
-  <div id="panel-path"></div>
+  <div id="panel-status"></div>
+  <div id="panel-goal"></div>
+  <div id="panel-meta"></div>
+  <hr id="panel-divider"/>
   <div id="panel-links"></div>
 </div>
 
-<div id="live"><div id="live-dot"></div><span id="live-text">Ansluten</span></div>
+<div id="live"><div id="live-dot"></div><span id="live-text">Live</span></div>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-const DATA = {"nodes": [{"id": "00-INDEX.md", "title": "AI Upscale Brain — 2nd Brain", "category": "hub", "r": 255, "g": 240, "b": 180, "recency": 0.969, "words": 192, "path": "00-INDEX.md", "degree": 17}, {"id": "03-agents/INDEX.md", "title": "03-agents — Agent Registry & Skills", "category": "agent", "r": 255, "g": 200, "b": 150, "recency": 0.968, "words": 69, "path": "03-agents/INDEX.md", "degree": 4}, {"id": "03-agents/AGENTS_REGISTRY.md", "title": "AGENTS & SKILLS REGISTRY — AI Upscale Agency", "category": "agent", "r": 255, "g": 200, "b": 150, "recency": 0.848, "words": 1243, "path": "03-agents/AGENTS_REGISTRY.md", "degree": 1}, {"id": "03-agents/skills/INDEX.md", "title": "Skills Index — 70+ Claude Code Skills", "category": "agent", "r": 255, "g": 200, "b": 150, "recency": 0.968, "words": 780, "path": "03-agents/skills/INDEX.md", "degree": 0}, {"id": "08-memory-backup/project_the_engine.md", "title": "The Engine — Agentic OS", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 487, "path": "08-memory-backup/project_the_engine.md", "degree": 0}, {"id": "08-memory-backup/feedback_always_commit.md", "title": "Alltid committa och pusha ändringar", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 122, "path": "08-memory-backup/feedback_always_commit.md", "degree": 0}, {"id": "08-memory-backup/feedback_channels_per_product.md", "title": "Säljkanaler per produkt — LinkedIn vs FB/TikTok", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 213, "path": "08-memory-backup/feedback_channels_per_product.md", "degree": 0}, {"id": "08-memory-backup/project_paperclip_content_teams.md", "title": "Content & Media Factory (koncept, ej aktuellt att bygga)", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 211, "path": "08-memory-backup/project_paperclip_content_teams.md", "degree": 0}, {"id": "08-memory-backup/feedback_prefer_fewer_bigger_clients.md", "title": "Föredrar färre stora kunder, inte många små", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 199, "path": "08-memory-backup/feedback_prefer_fewer_bigger_clients.md", "degree": 0}, {"id": "08-memory-backup/project_eravault.md", "title": "EraVault YouTube-kanal", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 501, "path": "08-memory-backup/project_eravault.md", "degree": 0}, {"id": "08-memory-backup/infra_costs.md", "title": "Infra-kostnader för Mike (verifierat 2026-05-14)", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 213, "path": "08-memory-backup/infra_costs.md", "degree": 0}, {"id": "08-memory-backup/feedback_agent_validation_before_build.md", "title": "agenter-ska-validera-innan-vi-bygger", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 184, "path": "08-memory-backup/feedback_agent_validation_before_build.md", "degree": 0}, {"id": "08-memory-backup/skills_new_2026_05_17.md", "title": "Nya skills installerade 2026-05-17", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 238, "path": "08-memory-backup/skills_new_2026_05_17.md", "degree": 0}, {"id": "08-memory-backup/project_fluentic_ai.md", "title": "Fluentic AI — språkapp", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 183, "path": "08-memory-backup/project_fluentic_ai.md", "degree": 0}, {"id": "08-memory-backup/projects_registry.md", "title": "projects-registry-komplett-karta", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 196, "path": "08-memory-backup/projects_registry.md", "degree": 0}, {"id": "08-memory-backup/project_thyroidai.md", "title": "ThyroidAI projekt", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 588, "path": "08-memory-backup/project_thyroidai.md", "degree": 0}, {"id": "08-memory-backup/project_vercel_stripe.md", "title": "Vercel-hack — byt Stripe-keys före monetisering", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 185, "path": "08-memory-backup/project_vercel_stripe.md", "degree": 0}, {"id": "08-memory-backup/pricing_floors.md", "title": "Pris-golv per produkt/bransch", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 240, "path": "08-memory-backup/pricing_floors.md", "degree": 0}, {"id": "08-memory-backup/project_cluee_news_customer.md", "title": "Cluee News som kund", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 81, "path": "08-memory-backup/project_cluee_news_customer.md", "degree": 0}, {"id": "08-memory-backup/feedback_listen_first.md", "title": "Lyssna FÖRST på Mike — han upprepar inte gärna", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 282, "path": "08-memory-backup/feedback_listen_first.md", "degree": 0}, {"id": "08-memory-backup/MEMORY.md", "title": "AIOS Memory Index", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 544, "path": "08-memory-backup/MEMORY.md", "degree": 1}, {"id": "08-memory-backup/infra_openclaw.md", "title": "infra-openclaw", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 95, "path": "08-memory-backup/infra_openclaw.md", "degree": 0}, {"id": "08-memory-backup/feedback_llm_costs.md", "title": "LLM-kostnad och modellval", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 118, "path": "08-memory-backup/feedback_llm_costs.md", "degree": 0}, {"id": "08-memory-backup/feedback_remotion_iteration.md", "title": "Remotion-iterationer — leverera snabbt, ingen över-engineering", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 177, "path": "08-memory-backup/feedback_remotion_iteration.md", "degree": 0}, {"id": "08-memory-backup/skills_agents_registry.md", "title": "skills-agents-registry", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 191, "path": "08-memory-backup/skills_agents_registry.md", "degree": 2}, {"id": "08-memory-backup/feedback_speech_over_text.md", "title": "Talad kommunikation går före textperfektion (Fluentic AI)", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 263, "path": "08-memory-backup/feedback_speech_over_text.md", "degree": 0}, {"id": "08-memory-backup/project_master2.md", "title": "AI Upscale Master 3.0 — Docker + OpenClaw + Claude Code", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 205, "path": "08-memory-backup/project_master2.md", "degree": 0}, {"id": "08-memory-backup/project_ceo_adhd.md", "title": "CEO with ADHD projekt", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 133, "path": "08-memory-backup/project_ceo_adhd.md", "degree": 0}, {"id": "08-memory-backup/strategy_llm_tiering.md", "title": "LLM-tiering — Mike vs OpenClaw-agenter", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 184, "path": "08-memory-backup/strategy_llm_tiering.md", "degree": 1}, {"id": "08-memory-backup/mike_drivers.md", "title": "Mikes drivers — varför han bygger AIOS", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 235, "path": "08-memory-backup/mike_drivers.md", "degree": 0}, {"id": "08-memory-backup/project_extra_computer.md", "title": "Extra dator — för The Engine + parallella agenter", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 173, "path": "08-memory-backup/project_extra_computer.md", "degree": 0}, {"id": "08-memory-backup/project_thyroid_sprint_2026_05.md", "title": "ThyroidAI 7-dagars sprint (2026-05-17)", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 256, "path": "08-memory-backup/project_thyroid_sprint_2026_05.md", "degree": 0}, {"id": "08-memory-backup/feedback_video_bottleneck.md", "title": "Video är tvärgående flaskhals för ALLA projekt", "category": "default", "r": 200, "g": 200, "b": 220, "recency": 1.0, "words": 217, "path": "08-memory-backup/feedback_video_bottleneck.md", "degree": 0}, {"id": "01-strategy/claude-md/project-CLAUDE.md", "title": "AI Upscale Agency — Projekt-kontext (WHAT)", "category": "strategy", "r": 180, "g": 210, "b": 255, "recency": 0.98, "words": 1299, "path": "01-strategy/claude-md/project-CLAUDE.md", "degree": 0}, {"id": "01-strategy/claude-md/global-CLAUDE.md", "title": "Mike — Global Claude-konfiguration", "category": "strategy", "r": 180, "g": 210, "b": 255, "recency": 0.898, "words": 875, "path": "01-strategy/claude-md/global-CLAUDE.md", "degree": 2}, {"id": "04-projects/PROJECTS_REGISTRY.md", "title": "PROJECTS_REGISTRY — komplett karta över alla projekt", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.967, "words": 746, "path": "04-projects/PROJECTS_REGISTRY.md", "degree": 0}, {"id": "04-projects/INDEX.md", "title": "Projekt-översikt — 13 aktiva projekt", "category": "hub", "r": 255, "g": 240, "b": 180, "recency": 0.969, "words": 184, "path": "04-projects/INDEX.md", "degree": 14}, {"id": "04-projects/aios-core-landing/README.md", "title": "AIOS Core Landing — AI Upscale Agency", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.708, "words": 154, "path": "04-projects/aios-core-landing/README.md", "degree": 2}, {"id": "04-projects/aios-core-landing/CLAUDE.md", "title": "AIOS Landing — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.65, "words": 109, "path": "04-projects/aios-core-landing/CLAUDE.md", "degree": 0}, {"id": "04-projects/ceo-with-adhd/README.md", "title": "CEO with ADHD", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.564, "words": 742, "path": "04-projects/ceo-with-adhd/README.md", "degree": 2}, {"id": "04-projects/ceo-with-adhd/CLAUDE.md", "title": "CEO with ADHD — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 317, "path": "04-projects/ceo-with-adhd/CLAUDE.md", "degree": 0}, {"id": "04-projects/thyroidai/README.md", "title": "or", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.0, "words": 155, "path": "04-projects/thyroidai/README.md", "degree": 2}, {"id": "04-projects/thyroidai/CLAUDE.md", "title": "ThyroidAI Clinic — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 395, "path": "04-projects/thyroidai/CLAUDE.md", "degree": 0}, {"id": "04-projects/ze-parts/README.md", "title": "Ze-Parts — AIOS för fordonsdelar", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.968, "words": 93, "path": "04-projects/ze-parts/README.md", "degree": 2}, {"id": "04-projects/ze-parts/CLAUDE.md", "title": "Ze-Parts — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 239, "path": "04-projects/ze-parts/CLAUDE.md", "degree": 0}, {"id": "04-projects/mikael-trading-os/README.md", "title": "trading-agent", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.4, "words": 829, "path": "04-projects/mikael-trading-os/README.md", "degree": 2}, {"id": "04-projects/mikael-trading-os/CLAUDE.md", "title": "Trading OS — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.672, "words": 109, "path": "04-projects/mikael-trading-os/CLAUDE.md", "degree": 0}, {"id": "04-projects/byggflow/README.md", "title": "ByggFlow", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.397, "words": 101, "path": "04-projects/byggflow/README.md", "degree": 2}, {"id": "04-projects/byggflow/CLAUDE.md", "title": "ByggFlow — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 257, "path": "04-projects/byggflow/CLAUDE.md", "degree": 0}, {"id": "04-projects/caso-chile-dashboard/README.md", "title": "Caso Chile — Familjens AI-team", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.283, "words": 256, "path": "04-projects/caso-chile-dashboard/README.md", "degree": 2}, {"id": "04-projects/caso-chile-dashboard/CLAUDE.md", "title": "Caso Chile — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.65, "words": 109, "path": "04-projects/caso-chile-dashboard/CLAUDE.md", "degree": 0}, {"id": "04-projects/af-sius/README.md", "title": "AF-SIUS — AI-drivet jobbsökar-OS", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.968, "words": 150, "path": "04-projects/af-sius/README.md", "degree": 2}, {"id": "04-projects/af-sius/CLAUDE.md", "title": "AF-SIUS — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 351, "path": "04-projects/af-sius/CLAUDE.md", "degree": 0}, {"id": "04-projects/fluentic-ai/README.md", "title": "Fluentic AI", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.493, "words": 653, "path": "04-projects/fluentic-ai/README.md", "degree": 2}, {"id": "04-projects/fluentic-ai/CLAUDE.md", "title": "Fluentic AI — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 249, "path": "04-projects/fluentic-ai/CLAUDE.md", "degree": 0}, {"id": "04-projects/graphify-mall-ai-os/README.md", "title": "Graphify Mall", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.397, "words": 101, "path": "04-projects/graphify-mall-ai-os/README.md", "degree": 2}, {"id": "04-projects/graphify-mall-ai-os/CLAUDE.md", "title": "Graphify Mall — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.672, "words": 109, "path": "04-projects/graphify-mall-ai-os/CLAUDE.md", "degree": 0}, {"id": "04-projects/aiupscale-monitor/README.md", "title": "AI Upscale Monitor", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.62, "words": 298, "path": "04-projects/aiupscale-monitor/README.md", "degree": 2}, {"id": "04-projects/aiupscale-monitor/CLAUDE.md", "title": "Monitor — CLAUDE", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.62, "words": 1, "path": "04-projects/aiupscale-monitor/CLAUDE.md", "degree": 0}, {"id": "04-projects/aios-core/README.md", "title": "AIOS Core — AI Upscale Agency", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.011, "words": 161, "path": "04-projects/aios-core/README.md", "degree": 2}, {"id": "04-projects/aios-core/CLAUDE.md", "title": "AIOS Core — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 328, "path": "04-projects/aios-core/CLAUDE.md", "degree": 0}, {"id": "04-projects/infrea-insight/README.md", "title": "Infrea-Insight", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.397, "words": 101, "path": "04-projects/infrea-insight/README.md", "degree": 2}, {"id": "04-projects/infrea-insight/CLAUDE.md", "title": "Infrea-Insight — CLAUDE.md", "category": "project", "r": 180, "g": 255, "b": 220, "recency": 0.848, "words": 250, "path": "04-projects/infrea-insight/CLAUDE.md", "degree": 0}], "links": [{"source": "00-INDEX.md", "target": "04-projects/INDEX.md"}, {"source": "00-INDEX.md", "target": "01-strategy/claude-md/global-CLAUDE.md"}, {"source": "00-INDEX.md", "target": "03-agents/INDEX.md"}, {"source": "00-INDEX.md", "target": "08-memory-backup/MEMORY.md"}, {"source": "00-INDEX.md", "target": "04-projects/thyroidai/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/byggflow/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/infrea-insight/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/af-sius/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/fluentic-ai/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/ceo-with-adhd/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/aios-core/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/ze-parts/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/graphify-mall-ai-os/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/aios-core-landing/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/aiupscale-monitor/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/caso-chile-dashboard/README.md"}, {"source": "00-INDEX.md", "target": "04-projects/mikael-trading-os/README.md"}, {"source": "03-agents/INDEX.md", "target": "03-agents/AGENTS_REGISTRY.md"}, {"source": "03-agents/INDEX.md", "target": "01-strategy/claude-md/global-CLAUDE.md"}, {"source": "03-agents/INDEX.md", "target": "08-memory-backup/skills_agents_registry.md"}, {"source": "08-memory-backup/skills_agents_registry.md", "target": "08-memory-backup/strategy_llm_tiering.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aios-core-landing/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/ceo-with-adhd/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/thyroidai/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/ze-parts/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/mikael-trading-os/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/byggflow/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/caso-chile-dashboard/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/af-sius/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/fluentic-ai/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/graphify-mall-ai-os/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aiupscale-monitor/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aios-core/README.md"}, {"source": "04-projects/INDEX.md", "target": "04-projects/infrea-insight/README.md"}]};
+const DATA = {"nodes": [{"id": "00-INDEX.md", "title": "AI Upscale Brain — 2nd Brain", "category": "hub", "r": 255, "g": 240, "b": 150, "recency": 0.969, "words": 192, "path": "00-INDEX.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 19}, {"id": "03-agents/INDEX.md", "title": "03-agents — Agent Registry & Skills", "category": "agent", "r": 255, "g": 200, "b": 120, "recency": 0.968, "words": 69, "path": "03-agents/INDEX.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 4}, {"id": "03-agents/AGENTS_REGISTRY.md", "title": "AGENTS & SKILLS REGISTRY — AI Upscale Agency", "category": "agent", "r": 255, "g": 200, "b": 120, "recency": 0.848, "words": 1243, "path": "03-agents/AGENTS_REGISTRY.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 1}, {"id": "03-agents/skills/INDEX.md", "title": "Skills Index — 70+ Claude Code Skills", "category": "agent", "r": 255, "g": 200, "b": 120, "recency": 0.968, "words": 780, "path": "03-agents/skills/INDEX.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_the_engine.md", "title": "The Engine — Agentic OS", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 487, "path": "08-memory-backup/project_the_engine.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_always_commit.md", "title": "Alltid committa och pusha ändringar", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 122, "path": "08-memory-backup/feedback_always_commit.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_channels_per_product.md", "title": "Säljkanaler per produkt — LinkedIn vs FB/TikTok", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 213, "path": "08-memory-backup/feedback_channels_per_product.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_paperclip_content_teams.md", "title": "Content & Media Factory (koncept, ej aktuellt att bygga)", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 211, "path": "08-memory-backup/project_paperclip_content_teams.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_prefer_fewer_bigger_clients.md", "title": "Föredrar färre stora kunder, inte många små", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 199, "path": "08-memory-backup/feedback_prefer_fewer_bigger_clients.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_eravault.md", "title": "EraVault YouTube-kanal", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 501, "path": "08-memory-backup/project_eravault.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/infra_costs.md", "title": "Infra-kostnader för Mike (verifierat 2026-05-14)", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 213, "path": "08-memory-backup/infra_costs.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_agent_validation_before_build.md", "title": "agenter-ska-validera-innan-vi-bygger", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 184, "path": "08-memory-backup/feedback_agent_validation_before_build.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/skills_new_2026_05_17.md", "title": "Nya skills installerade 2026-05-17", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 238, "path": "08-memory-backup/skills_new_2026_05_17.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_fluentic_ai.md", "title": "Fluentic AI — språkapp", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 183, "path": "08-memory-backup/project_fluentic_ai.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/projects_registry.md", "title": "projects-registry-komplett-karta", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 196, "path": "08-memory-backup/projects_registry.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_thyroidai.md", "title": "ThyroidAI projekt", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 588, "path": "08-memory-backup/project_thyroidai.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_vercel_stripe.md", "title": "Vercel-hack — byt Stripe-keys före monetisering", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 185, "path": "08-memory-backup/project_vercel_stripe.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/pricing_floors.md", "title": "Pris-golv per produkt/bransch", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 240, "path": "08-memory-backup/pricing_floors.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_cluee_news_customer.md", "title": "Cluee News som kund", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 81, "path": "08-memory-backup/project_cluee_news_customer.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_listen_first.md", "title": "Lyssna FÖRST på Mike — han upprepar inte gärna", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 282, "path": "08-memory-backup/feedback_listen_first.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/MEMORY.md", "title": "AIOS Memory Index", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 544, "path": "08-memory-backup/MEMORY.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 1}, {"id": "08-memory-backup/infra_openclaw.md", "title": "infra-openclaw", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 95, "path": "08-memory-backup/infra_openclaw.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_llm_costs.md", "title": "LLM-kostnad och modellval", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 118, "path": "08-memory-backup/feedback_llm_costs.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_remotion_iteration.md", "title": "Remotion-iterationer — leverera snabbt, ingen över-engineering", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 177, "path": "08-memory-backup/feedback_remotion_iteration.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/skills_agents_registry.md", "title": "skills-agents-registry", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 191, "path": "08-memory-backup/skills_agents_registry.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 2}, {"id": "08-memory-backup/feedback_speech_over_text.md", "title": "Talad kommunikation går före textperfektion (Fluentic AI)", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 263, "path": "08-memory-backup/feedback_speech_over_text.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_master2.md", "title": "AI Upscale Master 3.0 — Docker + OpenClaw + Claude Code", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 205, "path": "08-memory-backup/project_master2.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_ceo_adhd.md", "title": "CEO with ADHD projekt", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 133, "path": "08-memory-backup/project_ceo_adhd.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/strategy_llm_tiering.md", "title": "LLM-tiering — Mike vs OpenClaw-agenter", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 184, "path": "08-memory-backup/strategy_llm_tiering.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 1}, {"id": "08-memory-backup/mike_drivers.md", "title": "Mikes drivers — varför han bygger AIOS", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 235, "path": "08-memory-backup/mike_drivers.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_extra_computer.md", "title": "Extra dator — för The Engine + parallella agenter", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 173, "path": "08-memory-backup/project_extra_computer.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/project_thyroid_sprint_2026_05.md", "title": "ThyroidAI 7-dagars sprint (2026-05-17)", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 256, "path": "08-memory-backup/project_thyroid_sprint_2026_05.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "08-memory-backup/feedback_video_bottleneck.md", "title": "Video är tvärgående flaskhals för ALLA projekt", "category": "default", "r": 170, "g": 170, "b": 190, "recency": 1.0, "words": 217, "path": "08-memory-backup/feedback_video_bottleneck.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "01-strategy/claude-md/project-CLAUDE.md", "title": "AI Upscale Agency — Projekt-kontext (WHAT)", "category": "strategy", "r": 180, "g": 210, "b": 255, "recency": 0.98, "words": 1299, "path": "01-strategy/claude-md/project-CLAUDE.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "01-strategy/claude-md/global-CLAUDE.md", "title": "Mike — Global Claude-konfiguration", "category": "strategy", "r": 180, "g": 210, "b": 255, "recency": 0.898, "words": 875, "path": "01-strategy/claude-md/global-CLAUDE.md", "slug": "", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 2}, {"id": "04-projects/PROJECTS_REGISTRY.md", "title": "PROJECTS_REGISTRY — komplett karta över alla projekt", "category": "project", "r": 170, "g": 170, "b": 190, "recency": 0.967, "words": 746, "path": "04-projects/PROJECTS_REGISTRY.md", "slug": "PROJECTS_REGISTRY.md", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 0}, {"id": "04-projects/INDEX.md", "title": "Projekt-översikt — 13 aktiva projekt", "category": "hub", "r": 255, "g": 240, "b": 150, "recency": 0.969, "words": 184, "path": "04-projects/INDEX.md", "slug": "INDEX.md", "meta_type": "", "meta_status": "", "meta_goal": "", "meta_segment": "", "meta_tech": "", "meta_agents": "", "degree": 16}, {"id": "04-projects/aios-core-landing/README.md", "title": "AIOS Core Landing — AI Upscale Agency", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.708, "words": 154, "path": "04-projects/aios-core-landing/README.md", "slug": "aios-core-landing", "meta_type": "Marketing", "meta_status": "Live?", "meta_goal": "Lead gen för AIOS", "meta_segment": "landningssida", "meta_tech": "next.js, vercel", "meta_agents": "", "degree": 3}, {"id": "04-projects/aios-core-landing/CLAUDE.md", "title": "AIOS Landing — CLAUDE", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.65, "words": 109, "path": "04-projects/aios-core-landing/CLAUDE.md", "slug": "aios-core-landing", "meta_type": "Marketing", "meta_status": "Live?", "meta_goal": "Lead gen för AIOS", "meta_segment": "landningssida", "meta_tech": "next.js, vercel", "meta_agents": "", "degree": 0}, {"id": "04-projects/ceo-with-adhd/README.md", "title": "CEO with ADHD", "category": "b2c", "r": 100, "g": 255, "b": 180, "recency": 0.564, "words": 742, "path": "04-projects/ceo-with-adhd/README.md", "slug": "ceo-with-adhd", "meta_type": "B2C", "meta_status": "Klar — saknar video", "meta_goal": "100 MSEK/år", "meta_segment": "utbildning", "meta_tech": "next.js, supabase, stripe, video-content, capacitor", "meta_agents": "content-agent, coaching-bot", "degree": 4}, {"id": "04-projects/ceo-with-adhd/CLAUDE.md", "title": "CEO with ADHD — CLAUDE.md", "category": "b2c", "r": 100, "g": 255, "b": 180, "recency": 0.848, "words": 317, "path": "04-projects/ceo-with-adhd/CLAUDE.md", "slug": "ceo-with-adhd", "meta_type": "B2C", "meta_status": "Klar — saknar video", "meta_goal": "100 MSEK/år", "meta_segment": "utbildning", "meta_tech": "next.js, supabase, stripe, video-content, capacitor", "meta_agents": "content-agent, coaching-bot", "degree": 0}, {"id": "04-projects/thyroidai/README.md", "title": "or", "category": "b2c", "r": 100, "g": 255, "b": 180, "recency": 0.0, "words": 155, "path": "04-projects/thyroidai/README.md", "slug": "thyroidai", "meta_type": "B2C", "meta_status": "LIVE", "meta_goal": "150 MSEK/år · 21 regioner", "meta_segment": "hälsa", "meta_tech": "next.js, supabase, stripe, docker, gemini, capacitor", "meta_agents": "ai-doktor, voice-agent, gemini-live", "degree": 4}, {"id": "04-projects/thyroidai/CLAUDE.md", "title": "ThyroidAI Clinic — CLAUDE.md", "category": "b2c", "r": 100, "g": 255, "b": 180, "recency": 0.848, "words": 395, "path": "04-projects/thyroidai/CLAUDE.md", "slug": "thyroidai", "meta_type": "B2C", "meta_status": "LIVE", "meta_goal": "150 MSEK/år · 21 regioner", "meta_segment": "hälsa", "meta_tech": "next.js, supabase, stripe, docker, gemini, capacitor", "meta_agents": "ai-doktor, voice-agent, gemini-live", "degree": 0}, {"id": "04-projects/ze-parts/README.md", "title": "Ze-Parts — AIOS för fordonsdelar", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.968, "words": 93, "path": "04-projects/ze-parts/README.md", "slug": "ze-parts", "meta_type": "B2B", "meta_status": "Snart klar", "meta_goal": "Potentiell kund", "meta_segment": "e-handel", "meta_tech": "next.js, supabase, aios, stripe", "meta_agents": "aios-agent, aiupscale-sales", "degree": 4}, {"id": "04-projects/ze-parts/CLAUDE.md", "title": "Ze-Parts — CLAUDE.md", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.848, "words": 239, "path": "04-projects/ze-parts/CLAUDE.md", "slug": "ze-parts", "meta_type": "B2B", "meta_status": "Snart klar", "meta_goal": "Potentiell kund", "meta_segment": "e-handel", "meta_tech": "next.js, supabase, aios, stripe", "meta_agents": "aios-agent, aiupscale-sales", "degree": 0}, {"id": "04-projects/mikael-trading-os/README.md", "title": "trading-agent", "category": "paused", "r": 80, "g": 80, "b": 90, "recency": 0.4, "words": 829, "path": "04-projects/mikael-trading-os/README.md", "slug": "mikael-trading-os", "meta_type": "Pausad", "meta_status": "PAUSAD", "meta_goal": "Pausad — använder en killes system", "meta_segment": "trading", "meta_tech": "python", "meta_agents": "", "degree": 2}, {"id": "04-projects/mikael-trading-os/CLAUDE.md", "title": "Trading OS — CLAUDE", "category": "paused", "r": 80, "g": 80, "b": 90, "recency": 0.672, "words": 109, "path": "04-projects/mikael-trading-os/CLAUDE.md", "slug": "mikael-trading-os", "meta_type": "Pausad", "meta_status": "PAUSAD", "meta_goal": "Pausad — använder en killes system", "meta_segment": "trading", "meta_tech": "python", "meta_agents": "", "degree": 0}, {"id": "04-projects/byggflow/README.md", "title": "ByggFlow", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.397, "words": 101, "path": "04-projects/byggflow/README.md", "slug": "byggflow", "meta_type": "B2B", "meta_status": "I princip klar", "meta_goal": "69 900 kr + prenumeration", "meta_segment": "hantverkare", "meta_tech": "next.js, supabase, stripe, aios, openclaw", "meta_agents": "aios-agent, cold-calling, aiupscale-sales", "degree": 6}, {"id": "04-projects/byggflow/CLAUDE.md", "title": "ByggFlow — CLAUDE.md", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.848, "words": 257, "path": "04-projects/byggflow/CLAUDE.md", "slug": "byggflow", "meta_type": "B2B", "meta_status": "I princip klar", "meta_goal": "69 900 kr + prenumeration", "meta_segment": "hantverkare", "meta_tech": "next.js, supabase, stripe, aios, openclaw", "meta_agents": "aios-agent, cold-calling, aiupscale-sales", "degree": 0}, {"id": "04-projects/caso-chile-dashboard/README.md", "title": "Caso Chile — Familjens AI-team", "category": "internal", "r": 160, "g": 160, "b": 180, "recency": 0.283, "words": 256, "path": "04-projects/caso-chile-dashboard/README.md", "slug": "caso-chile-dashboard", "meta_type": "Internal", "meta_status": "Intern", "meta_goal": "Intern dashboard", "meta_segment": "dashboard", "meta_tech": "next.js, supabase", "meta_agents": "", "degree": 2}, {"id": "04-projects/caso-chile-dashboard/CLAUDE.md", "title": "Caso Chile — CLAUDE", "category": "internal", "r": 160, "g": 160, "b": 180, "recency": 0.65, "words": 109, "path": "04-projects/caso-chile-dashboard/CLAUDE.md", "slug": "caso-chile-dashboard", "meta_type": "Internal", "meta_status": "Intern", "meta_goal": "Intern dashboard", "meta_segment": "dashboard", "meta_tech": "next.js, supabase", "meta_agents": "", "degree": 0}, {"id": "04-projects/af-sius/README.md", "title": "AF-SIUS — AI-drivet jobbsökar-OS", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.968, "words": 150, "path": "04-projects/af-sius/README.md", "slug": "af-sius", "meta_type": "B2B", "meta_status": "Snart klar", "meta_goal": "150 000 kr + prenumeration", "meta_segment": "rekrytering", "meta_tech": "next.js, supabase, aios, openclaw", "meta_agents": "ai-recruiter, cold-calling, aiupscale-recruiter", "degree": 6}, {"id": "04-projects/af-sius/CLAUDE.md", "title": "AF-SIUS — CLAUDE.md", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.848, "words": 351, "path": "04-projects/af-sius/CLAUDE.md", "slug": "af-sius", "meta_type": "B2B", "meta_status": "Snart klar", "meta_goal": "150 000 kr + prenumeration", "meta_segment": "rekrytering", "meta_tech": "next.js, supabase, aios, openclaw", "meta_agents": "ai-recruiter, cold-calling, aiupscale-recruiter", "degree": 0}, {"id": "04-projects/fluentic-ai/README.md", "title": "Fluentic AI", "category": "b2c", "r": 100, "g": 255, "b": 180, "recency": 0.493, "words": 653, "path": "04-projects/fluentic-ai/README.md", "slug": "fluentic-ai", "meta_type": "B2C", "meta_status": "Igång", "meta_goal": "Mikes eget projekt", "meta_segment": "språk", "meta_tech": "next.js, supabase, stripe, gemini, voice-agent, capacitor", "meta_agents": "voice-agent, ai-tutor, gemini-live", "degree": 4}, {"id": "04-projects/fluentic-ai/CLAUDE.md", "title": "Fluentic AI — CLAUDE.md", "category": "b2c", "r": 100, "g": 255, "b": 180, "recency": 0.848, "words": 249, "path": "04-projects/fluentic-ai/CLAUDE.md", "slug": "fluentic-ai", "meta_type": "B2C", "meta_status": "Igång", "meta_goal": "Mikes eget projekt", "meta_segment": "språk", "meta_tech": "next.js, supabase, stripe, gemini, voice-agent, capacitor", "meta_agents": "voice-agent, ai-tutor, gemini-live", "degree": 0}, {"id": "04-projects/graphify-mall-ai-os/README.md", "title": "Graphify Mall", "category": "internal", "r": 160, "g": 160, "b": 180, "recency": 0.397, "words": 101, "path": "04-projects/graphify-mall-ai-os/README.md", "slug": "graphify-mall-ai-os", "meta_type": "Internal", "meta_status": "Intern", "meta_goal": "Mall för AI OS-visualisering", "meta_segment": "visualisering", "meta_tech": "python, d3.js", "meta_agents": "graphify", "degree": 2}, {"id": "04-projects/graphify-mall-ai-os/CLAUDE.md", "title": "Graphify Mall — CLAUDE", "category": "internal", "r": 160, "g": 160, "b": 180, "recency": 0.672, "words": 109, "path": "04-projects/graphify-mall-ai-os/CLAUDE.md", "slug": "graphify-mall-ai-os", "meta_type": "Internal", "meta_status": "Intern", "meta_goal": "Mall för AI OS-visualisering", "meta_segment": "visualisering", "meta_tech": "python, d3.js", "meta_agents": "graphify", "degree": 0}, {"id": "04-projects/aiupscale-monitor/README.md", "title": "AI Upscale Monitor", "category": "internal", "r": 160, "g": 160, "b": 180, "recency": 0.62, "words": 298, "path": "04-projects/aiupscale-monitor/README.md", "slug": "aiupscale-monitor", "meta_type": "Internal", "meta_status": "Intern", "meta_goal": "Intern systemövervakning", "meta_segment": "monitoring", "meta_tech": "next.js, supabase, aios", "meta_agents": "aios-agent", "degree": 3}, {"id": "04-projects/aiupscale-monitor/CLAUDE.md", "title": "Monitor — CLAUDE", "category": "internal", "r": 160, "g": 160, "b": 180, "recency": 0.62, "words": 1, "path": "04-projects/aiupscale-monitor/CLAUDE.md", "slug": "aiupscale-monitor", "meta_type": "Internal", "meta_status": "Intern", "meta_goal": "Intern systemövervakning", "meta_segment": "monitoring", "meta_tech": "next.js, supabase, aios", "meta_agents": "aios-agent", "degree": 0}, {"id": "04-projects/aios-core/README.md", "title": "AIOS Core — AI Upscale Agency", "category": "platform", "r": 200, "g": 150, "b": 255, "recency": 0.011, "words": 161, "path": "04-projects/aios-core/README.md", "slug": "aios-core", "meta_type": "Platform", "meta_status": "Pågår", "meta_goal": "Underliggande plattform för alla B2B", "meta_segment": "AIOS-plattform", "meta_tech": "next.js, supabase, stripe, openclaw, aios, docker", "meta_agents": "aios-agent, openclaw, ruflo", "degree": 10}, {"id": "04-projects/aios-core/CLAUDE.md", "title": "AIOS Core — CLAUDE.md", "category": "platform", "r": 200, "g": 150, "b": 255, "recency": 0.848, "words": 328, "path": "04-projects/aios-core/CLAUDE.md", "slug": "aios-core", "meta_type": "Platform", "meta_status": "Pågår", "meta_goal": "Underliggande plattform för alla B2B", "meta_segment": "AIOS-plattform", "meta_tech": "next.js, supabase, stripe, openclaw, aios, docker", "meta_agents": "aios-agent, openclaw, ruflo", "degree": 0}, {"id": "04-projects/infrea-insight/README.md", "title": "Infrea-Insight", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.397, "words": 101, "path": "04-projects/infrea-insight/README.md", "slug": "infrea-insight", "meta_type": "B2B", "meta_status": "I princip klar", "meta_goal": "69 900 kr+ prenumeration", "meta_segment": "hantverkare/kommuner", "meta_tech": "next.js, supabase, stripe, aios, openclaw", "meta_agents": "aios-agent, cold-calling, aiupscale-sales", "degree": 5}, {"id": "04-projects/infrea-insight/CLAUDE.md", "title": "Infrea-Insight — CLAUDE.md", "category": "b2b", "r": 120, "g": 180, "b": 255, "recency": 0.848, "words": 250, "path": "04-projects/infrea-insight/CLAUDE.md", "slug": "infrea-insight", "meta_type": "B2B", "meta_status": "I princip klar", "meta_goal": "69 900 kr+ prenumeration", "meta_segment": "hantverkare/kommuner", "meta_tech": "next.js, supabase, stripe, aios, openclaw", "meta_agents": "aios-agent, cold-calling, aiupscale-sales", "degree": 0}, {"id": "__arbetsmiljocenter", "title": "Arbetsmiljöcenter", "category": "customer", "r": 255, "g": 160, "b": 80, "recency": 0.85, "words": 0, "path": "(virtuell kundnod)", "slug": "__arbetsmiljocenter", "meta_type": "Kund (bekräftad)", "meta_status": "DEAL BEKRÄFTAD", "meta_goal": "Cold Calling Agents (Spår 1: Retell, Spår 2: Agora+Gemini)", "meta_segment": "cold-calling", "meta_tech": "", "meta_agents": "", "degree": 4}, {"id": "__cluee", "title": "Cluee (247K YT)", "category": "customer", "r": 255, "g": 160, "b": 80, "recency": 0.85, "words": 0, "path": "(virtuell kundnod)", "slug": "__cluee", "meta_type": "Potentiell kund", "meta_status": "Pitch pågår", "meta_goal": "AI nyhetsvideos 20–40 min + shorts", "meta_segment": "video/nyheter", "meta_tech": "", "meta_agents": "", "degree": 3}], "links": [{"source": "00-INDEX.md", "target": "04-projects/INDEX.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "01-strategy/claude-md/global-CLAUDE.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "03-agents/INDEX.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "08-memory-backup/MEMORY.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/thyroidai/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/byggflow/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/infrea-insight/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/af-sius/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/fluentic-ai/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/ceo-with-adhd/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/aios-core/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/ze-parts/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/graphify-mall-ai-os/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/aios-core-landing/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/aiupscale-monitor/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/caso-chile-dashboard/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "04-projects/mikael-trading-os/README.md", "etype": "wiki"}, {"source": "03-agents/INDEX.md", "target": "03-agents/AGENTS_REGISTRY.md", "etype": "wiki"}, {"source": "03-agents/INDEX.md", "target": "01-strategy/claude-md/global-CLAUDE.md", "etype": "wiki"}, {"source": "03-agents/INDEX.md", "target": "08-memory-backup/skills_agents_registry.md", "etype": "wiki"}, {"source": "08-memory-backup/skills_agents_registry.md", "target": "08-memory-backup/strategy_llm_tiering.md", "etype": "wiki"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aios-core-landing/README.md", "etype": "wiki"}, {"source": "00-INDEX.md", "target": "__arbetsmiljocenter", "etype": "hub"}, {"source": "00-INDEX.md", "target": "__cluee", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/thyroidai/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/ceo-with-adhd/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/fluentic-ai/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/byggflow/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/infrea-insight/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/af-sius/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/ze-parts/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aios-core/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/aiupscale-monitor/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/graphify-mall-ai-os/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/mikael-trading-os/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "04-projects/caso-chile-dashboard/README.md", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "__arbetsmiljocenter", "etype": "hub"}, {"source": "04-projects/INDEX.md", "target": "__cluee", "etype": "hub"}, {"source": "04-projects/thyroidai/README.md", "target": "04-projects/fluentic-ai/README.md", "etype": "cross"}, {"source": "04-projects/thyroidai/README.md", "target": "04-projects/ceo-with-adhd/README.md", "etype": "cross"}, {"source": "04-projects/ceo-with-adhd/README.md", "target": "04-projects/fluentic-ai/README.md", "etype": "cross"}, {"source": "04-projects/byggflow/README.md", "target": "04-projects/infrea-insight/README.md", "etype": "cross"}, {"source": "04-projects/byggflow/README.md", "target": "04-projects/aios-core/README.md", "etype": "cross"}, {"source": "04-projects/byggflow/README.md", "target": "04-projects/af-sius/README.md", "etype": "cross"}, {"source": "04-projects/infrea-insight/README.md", "target": "04-projects/aios-core/README.md", "etype": "cross"}, {"source": "04-projects/infrea-insight/README.md", "target": "04-projects/af-sius/README.md", "etype": "cross"}, {"source": "04-projects/af-sius/README.md", "target": "04-projects/aios-core/README.md", "etype": "cross"}, {"source": "04-projects/ze-parts/README.md", "target": "04-projects/aios-core/README.md", "etype": "cross"}, {"source": "04-projects/ze-parts/README.md", "target": "04-projects/byggflow/README.md", "etype": "cross"}, {"source": "04-projects/aios-core/README.md", "target": "04-projects/aiupscale-monitor/README.md", "etype": "cross"}, {"source": "04-projects/aios-core-landing/README.md", "target": "04-projects/aios-core/README.md", "etype": "cross"}, {"source": "__arbetsmiljocenter", "target": "04-projects/aios-core/README.md", "etype": "cross"}, {"source": "__arbetsmiljocenter", "target": "04-projects/af-sius/README.md", "etype": "cross"}, {"source": "__cluee", "target": "04-projects/aios-core/README.md", "etype": "cross"}]};
 const W = () => window.innerWidth, H = () => window.innerHeight;
 
-// Adjacency
+// Adjacency map
 const adj = {};
 DATA.links.forEach(l => {
-  if (!adj[l.source]) adj[l.source] = [];
-  if (!adj[l.target]) adj[l.target] = [];
-  adj[l.source].push(l.target);
-  adj[l.target].push(l.source);
+  const s = l.source.id||l.source, t = l.target.id||l.target;
+  (adj[s]||(adj[s]=[])).push(t);
+  (adj[t]||(adj[t]=[])).push(s);
 });
 
-// Nodstorlek: baserat på degree + recency
 function starRadius(d) {
-  const base = d.category === "hub" ? 6 : 2;
-  return base + d.degree * 0.6 + d.recency * 4;
+  const hub = d.category === "hub" ? 8 : 0;
+  const proj = ["b2c","b2b","platform","customer"].includes(d.category) ? 4 : 2;
+  return hub || proj + d.degree * 0.5 + d.recency * 3.5;
 }
 
-// Stjärnfärg: tint + ljusstyrka baserat på recency
 function starColor(d, alpha) {
-  const brightness = 0.25 + d.recency * 0.75;
-  const r = Math.round(d.r * brightness);
-  const g = Math.round(d.g * brightness);
-  const b = Math.round(d.b * brightness);
-  return alpha !== undefined
-    ? `rgba(${r},${g},${b},${alpha})`
-    : `rgb(${r},${g},${b})`;
+  const br = 0.28 + d.recency * 0.72;
+  const r = Math.round(d.r * br), g = Math.round(d.g * br), b = Math.round(d.b * br);
+  return alpha !== undefined ? `rgba(${r},${g},${b},${alpha})` : `rgb(${r},${g},${b})`;
 }
 
 function glowFilter(d) {
   if (d.category === "hub") return "url(#glow-lg)";
+  if (["b2c","b2b","platform","customer"].includes(d.category)) return "url(#glow-md)";
   if (d.recency > 0.7 || d.degree > 3) return "url(#glow-md)";
   return "url(#glow-sm)";
 }
 
+function edgeColor(l) {
+  switch(l.etype) {
+    case "hub":    return "rgba(255,240,100,.18)";
+    case "cross":  return "rgba(255,150,50,.35)";
+    case "memory": return "rgba(180,100,255,.3)";
+    default:       return "rgba(255,255,255,.06)";
+  }
+}
+function edgeWidth(l) {
+  return l.etype === "cross" ? 1.2 : l.etype === "hub" ? 0.8 : 0.5;
+}
+
 const svg = d3.select("#canvas");
 const g   = svg.append("g");
-svg.call(d3.zoom().scaleExtent([0.05, 6]).on("zoom", e => g.attr("transform", e.transform)));
+svg.call(d3.zoom().scaleExtent([0.04,8]).on("zoom", e => g.attr("transform", e.transform)));
 
-// Sprida ut noder initialt som en galax
+// Initial positionering — projekt nära mitten, memory yttre ring
 DATA.nodes.forEach(n => {
-  const angle = Math.random() * 2 * Math.PI;
-  const dist  = 50 + Math.random() * Math.min(W(), H()) * 0.45;
-  n.x = W()/2 + Math.cos(angle) * dist;
-  n.y = H()/2 + Math.sin(angle) * dist;
+  const isproj = ["b2c","b2b","platform","customer"].includes(n.category);
+  const r = n.category==="hub" ? 0 :
+            isproj ? 150 + Math.random()*120 :
+            280 + Math.random()*220;
+  const a = Math.random()*2*Math.PI;
+  n.x = W()/2 + Math.cos(a)*r;
+  n.y = H()/2 + Math.sin(a)*r;
 });
 
 const sim = d3.forceSimulation(DATA.nodes)
-  .force("link", d3.forceLink(DATA.links).id(d => d.id).distance(d => {
-    const sc = d.source.category || "", tc = d.target.category || "";
-    if (sc === "hub" || tc === "hub") return 180;
-    return 100;
-  }).strength(0.3))
-  .force("charge", d3.forceManyBody().strength(-300).distanceMax(400))
-  .force("center", d3.forceCenter(W()/2, H()/2).strength(0.04))
-  .force("collide", d3.forceCollide(d => starRadius(d) + 10))
-  .alphaDecay(0.015);
+  .force("link", d3.forceLink(DATA.links).id(d=>d.id)
+    .distance(l => {
+      const sc = l.source.category||"", tc = l.target.category||"";
+      if (sc==="hub"||tc==="hub") return 200;
+      if (l.etype==="cross") return 140;
+      return 90;
+    }).strength(l => l.etype==="cross" ? 0.4 : 0.25))
+  .force("charge", d3.forceManyBody()
+    .strength(d => d.category==="hub" ? -800 :
+              ["b2c","b2b","platform","customer"].includes(d.category) ? -350 : -200)
+    .distanceMax(500))
+  .force("center", d3.forceCenter(W()/2, H()/2).strength(0.03))
+  .force("collide", d3.forceCollide(d => starRadius(d)+8))
+  .alphaDecay(0.012);
 
-// Kopplingar
 const link = g.append("g").selectAll("line")
   .data(DATA.links).join("line")
-  .attr("stroke", "rgba(255,255,255,0.06)")
-  .attr("stroke-width", 0.5);
+  .attr("stroke", edgeColor)
+  .attr("stroke-width", edgeWidth);
 
-// Stjärnor
 const node = g.append("g").selectAll(".star")
-  .data(DATA.nodes).join("g").attr("class", "star")
+  .data(DATA.nodes).join("g").attr("class","star")
   .call(d3.drag()
-    .on("start", (e,d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
-    .on("drag",  (e,d) => { d.fx=e.x; d.fy=e.y; })
-    .on("end",   (e,d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
-  )
-  .on("click", (e,d) => { e.stopPropagation(); selectStar(d); });
+    .on("start",(e,d)=>{ if(!e.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on("drag", (e,d)=>{ d.fx=e.x; d.fy=e.y; })
+    .on("end",  (e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+  .on("click",(e,d)=>{ e.stopPropagation(); selectStar(d); });
 
 node.append("circle")
-  .attr("r", d => starRadius(d))
+  .attr("r", starRadius)
   .attr("fill", d => starColor(d))
-  .attr("filter", d => glowFilter(d))
-  .style("cursor", "pointer");
+  .attr("filter", glowFilter)
+  .style("cursor","pointer");
 
-// Labels — bara för hub + högre degree
+// Alltid label för hub + projekt-kluster; annars bara vid high recency/degree
 node.append("text")
-  .attr("dy", d => starRadius(d) + 11)
-  .attr("text-anchor", "middle")
-  .attr("fill", d => starColor(d, 0.8))
-  .attr("font-size", d => d.category === "hub" ? "11px" : "9px")
-  .style("pointer-events", "none")
-  .style("text-shadow", "0 0 8px #000, 0 0 4px #000")
+  .attr("dy", d => starRadius(d)+11)
+  .attr("text-anchor","middle")
+  .attr("fill", d => starColor(d, d.category==="hub"?1:0.85))
+  .attr("font-size", d => {
+    if (d.category==="hub") return "12px";
+    if (["b2c","b2b","platform","customer"].includes(d.category)) return "10px";
+    return "8px";
+  })
+  .attr("font-weight", d => ["hub","b2c","b2b","platform","customer"].includes(d.category) ? "600" : "400")
+  .style("pointer-events","none")
+  .style("text-shadow","0 0 8px #000,0 0 4px #000")
   .text(d => {
-    if (d.category === "hub" || d.degree >= 4 || d.recency > 0.8) {
-      return d.title.length > 22 ? d.title.slice(0,20) + "…" : d.title;
-    }
-    return "";
+    const show = d.category==="hub"
+      || ["b2c","b2b","platform","customer"].includes(d.category)
+      || d.degree>=4 || d.recency>0.8;
+    if (!show) return "";
+    return d.title.length>24 ? d.title.slice(0,22)+"…" : d.title;
   });
 
-sim.on("tick", () => {
-  link.attr("x1", d=>d.source.x).attr("y1", d=>d.source.y)
-      .attr("x2", d=>d.target.x).attr("y2", d=>d.target.y);
-  node.attr("transform", d=>`translate(${d.x},${d.y})`);
+sim.on("tick", ()=>{
+  link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y)
+      .attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+  node.attr("transform",d=>`translate(${d.x},${d.y})`);
 });
 
-// --- Interaktion ---
+// ── Interaktion ───────────────────────────────────────────────────────────────
 let orbitRing = null;
+
+const BADGE_COLORS = {
+  "hub":"rgba(255,240,100,.15)", "b2c":"rgba(100,255,180,.15)",
+  "b2b":"rgba(120,180,255,.15)", "platform":"rgba(200,150,255,.15)",
+  "customer":"rgba(255,160,80,.15)", "internal":"rgba(160,160,180,.12)",
+  "paused":"rgba(80,80,90,.15)", "memory":"rgba(200,160,255,.15)",
+  "agent":"rgba(255,200,120,.15)", "feedback":"rgba(120,220,255,.15)",
+};
 
 function selectStar(d) {
   const hl = new Set([d.id, ...(adj[d.id]||[])]);
-
-  // Orbit-ring
   if (orbitRing) orbitRing.remove();
   orbitRing = g.append("circle")
-    .attr("cx", d.x).attr("cy", d.y)
-    .attr("r", starRadius(d) + 18)
-    .attr("fill", "none")
-    .attr("stroke", starColor(d, 0.4))
-    .attr("stroke-width", 1)
-    .attr("stroke-dasharray", "4 3");
+    .attr("cx",d.x).attr("cy",d.y).attr("r",starRadius(d)+20)
+    .attr("fill","none").attr("stroke",starColor(d,.35))
+    .attr("stroke-width",1).attr("stroke-dasharray","4 3");
 
-  link.attr("stroke", l => {
-    const s = l.source.id||l.source, t = l.target.id||l.target;
-    return hl.has(s)&&hl.has(t) ? starColor(d, 0.5) : "rgba(255,255,255,0.03)";
-  }).attr("stroke-width", l => {
-    const s = l.source.id||l.source, t = l.target.id||l.target;
-    return hl.has(s)&&hl.has(t) ? 1 : 0.5;
-  });
-  node.select("circle").attr("opacity", n => hl.has(n.id) ? 1 : 0.15);
-  node.select("text").attr("opacity", n => hl.has(n.id) ? 1 : 0.05);
+  link
+    .attr("stroke", l=>{
+      const s=l.source.id||l.source, t=l.target.id||l.target;
+      return (hl.has(s)&&hl.has(t)) ? edgeColor(l).replace(/[\d.]+\)$/,"0.7)") : "rgba(255,255,255,.02)";
+    })
+    .attr("stroke-width", l=>{
+      const s=l.source.id||l.source, t=l.target.id||l.target;
+      return (hl.has(s)&&hl.has(t)) ? edgeWidth(l)*2 : 0.4;
+    });
+  node.select("circle").attr("opacity", n=>hl.has(n.id)?1:0.1);
+  node.select("text").attr("opacity", n=>hl.has(n.id)?1:0.04);
 
-  const panel = document.getElementById("panel");
-  panel.classList.add("open");
+  // Panel
+  document.getElementById("panel").classList.add("open");
+  const col = starColor(d);
+
+  const badge = document.getElementById("panel-badge");
+  badge.textContent = d.meta_type || d.category;
+  badge.style.background = BADGE_COLORS[d.category]||"rgba(255,255,255,.08)";
+  badge.style.color = col;
+  badge.style.border = `1px solid ${col.replace("rgb","rgba").replace(")",",0.3)")}`||"";
+
   document.getElementById("panel-title").textContent = d.title;
-  document.getElementById("panel-title").style.color = starColor(d);
-  document.getElementById("panel-cat").textContent = d.category;
-  const pct = Math.round(d.recency * 100);
-  document.getElementById("panel-recency").innerHTML =
-    `<span style="color:${starColor(d)}">★</span> Aktualitet: ${pct}% (ljusare = nyare)`;
-  document.getElementById("panel-path").textContent = d.path;
+  document.getElementById("panel-title").style.color = col;
+  document.getElementById("panel-status").textContent = d.meta_status || "";
+  document.getElementById("panel-goal").innerHTML =
+    d.meta_goal ? `<span style="color:${col}">◎</span> ${d.meta_goal}` : "";
+
+  let meta = "";
+  if (d.meta_segment) meta += `<div class="pmeta"><strong>Segment:</strong> ${d.meta_segment}</div>`;
+  if (d.meta_tech)    meta += `<div class="pmeta"><strong>Tech:</strong> ${d.meta_tech}</div>`;
+  if (d.meta_agents)  meta += `<div class="pmeta"><strong>Agents:</strong> ${d.meta_agents}</div>`;
+  const pct = Math.round(d.recency*100);
+  meta += `<div class="pmeta"><strong>Aktualitet:</strong> ${pct}% · ${d.degree} kopplingar</div>`;
+  if (d.path !== "(virtuell kundnod)") meta += `<div class="pmeta" style="color:#1e1e35;font-size:8px">${d.path}</div>`;
+  document.getElementById("panel-meta").innerHTML = meta;
 
   const nbrs = adj[d.id]||[];
   document.getElementById("panel-links").innerHTML = nbrs.length
-    ? `<h3>Kopplingar (${nbrs.length})</h3>` + nbrs.map(nid => {
-        const nd = DATA.nodes.find(n=>n.id===nid);
-        return nd ? `<div class="plink" style="border-left-color:${starColor(nd)}" onclick="selectById('${nid}')">${nd.title}</div>` : "";
-      }).join("")
-    : `<span style="font-size:10px;color:#374151">Inga kopplingar</span>`;
+    ? `<h3>Kopplingar (${nbrs.length})</h3>`
+      + nbrs.map(nid=>{
+          const nd = DATA.nodes.find(n=>n.id===nid);
+          return nd ? `<div class="plink" style="border-left-color:${starColor(nd)}"
+            onclick="selectById('${nid}')">${nd.title}</div>` : "";
+        }).join("")
+    : `<div style="font-size:9px;color:#1e1e35">Inga kopplingar</div>`;
 }
 
 function closePanel() {
   if (orbitRing) { orbitRing.remove(); orbitRing=null; }
   document.getElementById("panel").classList.remove("open");
-  link.attr("stroke","rgba(255,255,255,0.06)").attr("stroke-width",0.5);
+  link.attr("stroke",edgeColor).attr("stroke-width",edgeWidth);
   node.select("circle").attr("opacity",1);
   node.select("text").attr("opacity",1);
 }
@@ -247,38 +360,61 @@ function selectById(id) {
   const nd = DATA.nodes.find(n=>n.id===id);
   if (nd) selectStar(nd);
 }
-
 svg.on("click", closePanel);
 
-// --- Sök ---
-document.getElementById("search").addEventListener("input", function() {
+// ── Sök ───────────────────────────────────────────────────────────────────────
+document.getElementById("search").addEventListener("input", function(){
   const q = this.value.toLowerCase().trim();
-  node.select("circle").attr("opacity", d => !q || d.title.toLowerCase().includes(q) ? 1 : 0.08);
-  node.select("text").attr("opacity", d => !q || d.title.toLowerCase().includes(q) ? 1 : 0.02);
-  if (!q) link.attr("stroke","rgba(255,255,255,0.06)");
+  node.select("circle").attr("opacity", d=>!q||d.title.toLowerCase().includes(q)?1:0.06);
+  node.select("text").attr("opacity", d=>!q||d.title.toLowerCase().includes(q)?1:0.02);
+  if (!q) link.attr("stroke",edgeColor).attr("stroke-width",edgeWidth);
 });
 
-window.addEventListener("resize", () =>
-  sim.force("center", d3.forceCenter(W()/2,H()/2)).alpha(0.1).restart()
+// ── Filter-knappar ───────────────────────────────────────────────────────────
+document.querySelectorAll(".fbtn").forEach(btn=>{
+  btn.addEventListener("click", function(){
+    document.querySelectorAll(".fbtn").forEach(b=>b.classList.remove("active"));
+    this.classList.add("active");
+    const cat = this.dataset.cat;
+    if (cat==="all") {
+      node.select("circle").attr("opacity",1);
+      node.select("text").attr("opacity",1);
+      link.attr("stroke",edgeColor).attr("stroke-width",edgeWidth).attr("opacity",1);
+    } else {
+      const visible = new Set(DATA.nodes.filter(n=>n.category===cat).map(n=>n.id));
+      // Inkludera grannarna
+      visible.forEach(id=>{ (adj[id]||[]).forEach(nb=>visible.add(nb)); });
+      node.select("circle").attr("opacity",n=>visible.has(n.id)?1:0.06);
+      node.select("text").attr("opacity",n=>visible.has(n.id)?1:0.02);
+      link.attr("opacity",l=>{
+        const s=l.source.id||l.source, t=l.target.id||l.target;
+        return visible.has(s)&&visible.has(t)?1:0.04;
+      });
+    }
+  });
+});
+
+window.addEventListener("resize",()=>
+  sim.force("center",d3.forceCenter(W()/2,H()/2)).alpha(.1).restart()
 );
 
-// --- Auto-reload via HEAD-polling (fungerar med python -m http.server) ---
+// ── Auto-reload ───────────────────────────────────────────────────────────────
 let _lastMod = null;
 async function pollForUpdates() {
   try {
-    const res = await fetch(window.location.href, {method:'HEAD', cache:'no-store'});
-    const lm  = res.headers.get('Last-Modified') || res.headers.get('ETag') || '';
-    if (_lastMod === null) { _lastMod = lm; }
-    else if (lm !== _lastMod) { window.location.reload(); return; }
-    document.getElementById("live-dot").style.background = "#10b981";
-    document.getElementById("live-text").textContent = "Live";
+    const res = await fetch(window.location.href,{method:"HEAD",cache:"no-store"});
+    const lm = res.headers.get("Last-Modified")||res.headers.get("ETag")||"";
+    if (_lastMod===null) { _lastMod=lm; }
+    else if (lm!==_lastMod) { window.location.reload(); return; }
+    document.getElementById("live-dot").style.background="#10b981";
+    document.getElementById("live-text").textContent="Live";
   } catch(e) {
-    document.getElementById("live-dot").style.background = "#6b7280";
-    document.getElementById("live-text").textContent = "Offline";
+    document.getElementById("live-dot").style.background="#6b7280";
+    document.getElementById("live-text").textContent="Offline";
   }
 }
 pollForUpdates();
-setInterval(pollForUpdates, 15000);
+setInterval(pollForUpdates,15000);
 </script>
 </body>
 </html>
