@@ -39,6 +39,9 @@ backups/
 *.tgz
 *.zip
 
+# Temporär backup av 08-memory (skapad vid symlink-migration 2026-06-17)
+Obsidian-Vaults/AI-Upscale-Brain/08-memory-backup/
+
 # Lokal cache
 .cache/
 **/.cache/
