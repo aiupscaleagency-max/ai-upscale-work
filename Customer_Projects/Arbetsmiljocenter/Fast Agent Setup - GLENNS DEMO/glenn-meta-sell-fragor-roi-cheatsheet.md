@@ -58,6 +58,20 @@
 - Vad var det som gjorde att du satte igång ett test med ringande agenter just nu?
 - Vilka resultat under dessa veckor skulle göra att du säger ja direkt till att förlänga?
 
+### Förebyggande / personliga frågor (ställ INNAN Glenn hinner invända)
+> Dessa ska kännas konkreta och personliga — svaren blir ammunition mot invändningar
+> Glenn ännu inte hunnit säga.
+- Hur mycket kostade det er att ta fram webbappen?
+- Hur mycket säljer ni för per dag, per vecka, per månad, per år ungefär just nu?
+- Vad kostar det er att ha en säljare som ringer på det — och hur mycket plus/minus blir det
+  per dag, vecka, månad och år?
+- Hur många produkter eller tjänster har ni totalt?
+- Vad säljer ni helst, och vad tjänar ni mest på?
+
+> **Stående regel:** Nämns en kostnad, tidsåtgång eller förlust PER MÅNAD (eller vecka/dag) —
+> räkna ALLTID ut och säg också vad det blir PER ÅR. En liten summa per dag ska kännas stor
+> när den blir en årssiffra. Gissa aldrig — använd Glenns egna tal.
+
 ---
 
 ## 2. Bekräftelsemönster (gör varje svar till bevis)
@@ -110,6 +124,11 @@ kommer använda mot era leads, bara mer direkt och mot ett billigare pris."
 
 Detta kopplar ihop demots teknik med produkten Glenn redan betalar för (webappen), och
 visar samtidigt varför Mikes uppdrag är värt att förlänga.
+
+**Framtids-rad att lägga till i visionen:** "Och det här är bara början — jag bygger redan
+ett system som värmer upp leads med mejl innan ni ringer, ser exakt när mejlet öppnas, och
+ringer automatiskt i samma sekund." (AI call-center + email outreach, kommande system —
+nämn bara som vision, inga löften om datum/pris.)
 
 ---
 
