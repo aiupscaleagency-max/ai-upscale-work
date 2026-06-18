@@ -1,5 +1,5 @@
 # AIOS_BRAIN — Mikael Luengo / AI Upscale Agency
-> **Auto-genererad:** 2026-06-17 18:10
+> **Auto-genererad:** 2026-06-18 05:38
 > **Källa:** `context-sync.py` — ändra ALDRIG manuellt, ändringarna skrivs över
 > **Tillgänglig:** Lokalt · GitHub (aiupscaleagency-max/ai-upscale-work) · Mobil · OpenClaw · Hermes
 
@@ -439,6 +439,25 @@ När Mike ber om Remotion-video: KÖR rendering, visa resultat. Inte "förbättr
 - Använd 180 kr för VPS, inte 80 kr eller "~$8"
 - Mike betalar redan VPS:n — DEPLOY på den när möjligt (ingen extra kostnad)
 - "På befintlig server" > "ny VPS" alltid
+
+### [infra_memory_sync]
+Byggd 2026-06-17. Gör att Mikes agenter kan ta vid varandra över verktyg/plattformar — men BARA på kommando (aldrig automatiskt, aldrig destruktivt).
+
+**Arkitektur (filbaserat git, ingen Supabase):**
+- Hub (sanningskälla): bare repo `/root/aios-memory.git` på Bluehost (129.121.91.54)
+- Segment: `shared/` (handoff-tavlan alla läser), `claude/`, `openclaw/`, `hermes/` — var och en äger sitt, additivt
+- Mac-clone: `~/aios-memory/`
+- Bluehost-clone: `/root/aios-memory-work/`
+
+**Triggers (manuella, enda sättet sync sker):**
+- "synka memory" → kör `~/.claude/bin/synka-memory` (Claude pushar sitt segment, tar emot `shared/`)
+- "uppdatera memory" → kör `/usr/local/bin/uppdatera-memory [openclaw|hermes]` på Bluehost (pullar `shared/`+eget segment till workspace, skickar tillbaka nya)
+
+**Säkerhet:** additivt (rsync utan delete), visar diff, `pull.rebase false` för merge. Raderar/byter aldrig tyst.
+
+**Ej byggt än (roadmap mot "Alice Labs brain"):** auto-ingestion av mail/CRM/transkript, nattlig graf-bygge. Detta är grunden, inte hela hjärnan.
+
+Relaterat: [[infra_context_hub_repo]] [[infra_openclaw]] [[project_the_engine]]
 
 ### [infra_openclaw]
 # OpenClaw — Infrastruktur
