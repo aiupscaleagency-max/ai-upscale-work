@@ -78,6 +78,22 @@ cd ai-upscale-work && git pull --recurse-submodules && git submodule update --re
 
 ---
 
-## 6. Det som INTE finns i repot (be Mikael om en andra bunt om det behövs)
-- **Claude-skills** (`~/.claude/skills/`) och **global config/memory** (`~/.claude/CLAUDE.md`, `agents/`, `memory/`) ligger lokalt på Mikaels Mac, inte i detta repo.
-- Om de ska med till GCP: Mikael paketerar dem som ett separat privat repo eller en tarball och skickar.
+## 6. ANDRA BUNTEN — Claude-config + alla skills (separat tarball)
+
+Allt i `~/.claude` (global CLAUDE.md, alla 81 skills, agents, 35 memory-filer) är paketerat som en tarball — **utan secrets, node_modules eller darwin-binärer** (de funkar ändå inte på GCP Linux och är återinstallerbara).
+
+**Bunt:** `claude-config-bundle.tar.gz` (~240 MB, 15 600 filer)
+
+**Steg (Mikael laddar upp, agenten extraherar):**
+```bash
+# 1) Mikael laddar upp till GCS (engång)
+gsutil cp ~/claude-config-bundle.tar.gz gs://<bucket>/
+
+# 2) Agenten hämtar + packar upp på sin GCP-instans
+gsutil cp gs://<bucket>/claude-config-bundle.tar.gz .
+mkdir -p claude-config && tar -xzf claude-config-bundle.tar.gz -C claude-config
+```
+
+Innehåll: `claude-config/CLAUDE.md`, `claude-config/skills/*`, `claude-config/agents/*`, `claude-config/projects/.../memory/*`.
+
+> ⚠️ Många skills (gstack, ruflo) är tredjeparts-verktyg — bra som referens/kontext, men för att FAKTISKT köra dem på GCP måste de återinstalleras på Linux (binärerna i bunten är borttagna med flit). Mikaels EGNA skills (graphify, content-humanizer, llm-council, mike-*, aiupscale-*) är ren källa och funkar som kontext direkt.
