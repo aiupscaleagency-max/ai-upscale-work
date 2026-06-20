@@ -110,6 +110,18 @@ Detta är min centrala "kontrollpanel". Härifrån vill jag styra alla mina proj
 
 ---
 
+## 7b. AURA-proxy → deploya till Cloud Run (online-versionen)
+
+`agent-os/aura-proxy.js` är AURA:s generativa AI-bro (håller Gemini-nyckeln hemlig). Den körs lokalt på Mac (`node aura-proxy.js`, port 8788) OCH ska köras online så Mike alltid når AURA.
+
+**Gemini — gör detta i molnet:**
+1. Lägg Mikes Gemini-nyckel (ny `AQ.`-nyckel) i **Secret Manager** (aldrig i en fil).
+2. Deploya `aura-proxy.js` till **Cloud Run** (Node, läser `GEMINI_API_KEY` + `PORT` från miljön — redan förberett).
+3. Ge Cloud Run-tjänsten åtkomst till hemligheten.
+4. Peka agent-os `AURA_PROXY`-URL till Cloud Run-endpointen (byt från `localhost:8788`).
+
+Då har Mike AURA **både lokalt och online** — exakt som han vill.
+
 ## 8. Setup-checklista för Cloud Shell (kör FÖRST)
 
 Gemini — kör dessa i Cloud Shell-terminalen innan något byggs:
