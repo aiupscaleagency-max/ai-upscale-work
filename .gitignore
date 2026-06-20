@@ -56,3 +56,6 @@ awesome-claude-design/
 
 # ECC-klon (referens, ej egen kod) — behåll utvärderingen
 _reference/ECC/
+
+# Brain-dumpar kan fånga secrets — håll utanför git
+_DASHBOARD/brain-out/merged-graph.json
