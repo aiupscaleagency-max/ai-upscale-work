@@ -1,7 +1,7 @@
 {
-  "generated": "2026-06-20T13:47:03.160Z",
+  "generated": "2026-06-20T21:08:57.905Z",
   "totals": {
-    "skills": 108,
+    "skills": 112,
     "agents": 33,
     "commands": 44
   },
@@ -144,6 +144,26 @@
     {
       "name": "document-release",
       "description": "Post-ship documentation update. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-connections-optimizer",
+      "description": "Reorganize the user's X and LinkedIn network with review-first pruning, add/follow recommendations, and channel-specific warm outreach drafted in the user's real voice. Use when the user wants to clean up following lists, grow toward current priorities, or rebalance a social graph around higher-signal relationships.",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-context-budget",
+      "description": "Audits Claude Code context window consumption across agents, skills, MCP servers, and rules. Identifies bloat, redundant components, and produces prioritized token-savings recommendations.",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-knowledge-ops",
+      "description": "Knowledge base management, ingestion, sync, and retrieval across multiple storage layers (local files, MCP memory, vector stores, Git repos). Use when the user wants to save, organize, sync, deduplicate, or search across their knowledge systems.",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-token-budget-advisor",
+      "description": ">-",
       "source": "egen"
     },
     {

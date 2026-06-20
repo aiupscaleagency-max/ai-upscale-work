@@ -1,3 +1,7 @@
+---
+summary: Komplett karta över ALLA agenter, skills och multi-agent frameworks.
+---
+
 # AGENTS & SKILLS REGISTRY — AI Upscale Agency
 
 > **Senast uppdaterad:** 2026-06-04
@@ -249,9 +253,9 @@ Output hamnar i `graphify-out/` och håller Graphify uppdaterat om alla agenter.
 
 > Genererad av `scripts/generate-inventory.js`. Maskinläsbar källa: `inventory.json`.
 
-**Totalt:** 108 skills · 33 agenter · 44 kommandon
+**Totalt:** 112 skills · 33 agenter · 44 kommandon
 
-### Skills (108)
+### Skills (112)
 
 | Name | Source | Description |
 |---|---|---|
@@ -295,6 +299,10 @@ Output hamnar i `graphify-out/` och håller Graphify uppdaterat om alla agenter.
 | diagram | egen | Turn an English description (or mermaid source) into a diagram triplet: the source, an editable .excalidraw file you can open (gstack) |
 | document-generate | egen | Generate missing documentation from scratch for a feature, module, or entire project. (gstack) |
 | document-release | egen | Post-ship documentation update. (gstack) |
+| ecc-connections-optimizer | egen | Reorganize the user's X and LinkedIn network with review-first pruning, add/follow recommendations, and channel-specific warm outreach drafted in the user's real voice. Use when the user wants to clean up following lists, grow toward current priorities, or rebalance a social graph around higher-signal relationships. |
+| ecc-context-budget | egen | Audits Claude Code context window consumption across agents, skills, MCP servers, and rules. Identifies bloat, redundant components, and produces prioritized token-savings recommendations. |
+| ecc-knowledge-ops | egen | Knowledge base management, ingestion, sync, and retrieval across multiple storage layers (local files, MCP memory, vector stores, Git repos). Use when the user wants to save, organize, sync, deduplicate, or search across their knowledge systems. |
+| ecc-token-budget-advisor | egen | >- |
 | example-command | plugin:claude-plugins-official | An example user-invoked skill that demonstrates frontmatter options and the skills/<name>/SKILL.md layout |
 | example-skill | plugin:claude-plugins-official | This skill should be used when the user asks to "demonstrate skills", "show skill format", "create a skill template", or discusses skill development patterns. Provides a reference template for creating Claude Code plugin skills. |
 | freeze | egen | Restrict file edits to a specific directory for the session. (gstack) |
