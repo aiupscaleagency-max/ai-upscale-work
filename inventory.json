@@ -1,8 +1,8 @@
 {
-  "generated": "2026-06-20T13:37:21.247Z",
+  "generated": "2026-06-20T13:47:03.160Z",
   "totals": {
     "skills": 108,
-    "agents": 29,
+    "agents": 33,
     "commands": 44
   },
   "skills": [
@@ -564,6 +564,30 @@
       "name": "deploy-agent",
       "description": "Vercel + Docker + Hostinger deploys för Mikes projekt. Använd för att deploya ThyroidAI (Docker→VPS), Fluentic/landing pages (Vercel), eller köra smoke tests efter deploy.",
       "tools": "Bash, Read, Grep",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-architect",
+      "description": "Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions.",
+      "tools": "[\"Read\", \"Grep\", \"Glob\"]",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-planner",
+      "description": "Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks.",
+      "tools": "[\"Read\", \"Grep\", \"Glob\"]",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-security-reviewer",
+      "description": "Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10 vulnerabilities.",
+      "tools": "[\"Read\", \"Write\", \"Edit\", \"Bash\", \"Grep\", \"Glob\"]",
+      "source": "egen"
+    },
+    {
+      "name": "ecc-tdd-guide",
+      "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",
+      "tools": "[\"Read\", \"Write\", \"Edit\", \"Bash\", \"Grep\"]",
       "source": "egen"
     },
     {

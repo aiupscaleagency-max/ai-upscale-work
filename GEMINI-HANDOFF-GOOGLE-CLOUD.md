@@ -34,7 +34,8 @@ Detta är min centrala "kontrollpanel". Härifrån vill jag styra alla mina proj
 **Mina resurser som ska in i systemet** (full katalog: `inventory.json`):
 - **16 projekt** (ThyroidAI, Byggflow, Infrea, AF-SIUS, CEO with ADHD, Cluee, Fluentic m.fl.)
 - **108 skills** (80 egna + 28 plugin) — `~/.claude/skills/` + `~/.claude/plugins/`
-- **29 agenter** (6 egna + 23 plugin) + multi-agent-frameworks (ruflo, llm-council)
+- **33 agenter** (10 egna inkl. 4 ECC-agenter + 23 plugin) + multi-agent-frameworks (ruflo, llm-council)
+- **Samlad Chatt** (ny OS-sida): alla agenter — Claude, OpenClaw, Hermes, Gemini m.fl. — i EN tråd
 - **44 kommandon** (15 egna + 29 plugin), **9 contexts**, registries (`REGISTRY.md`, `PROJECTS_REGISTRY.md`, `AGENTS_REGISTRY.md`)
 - **`inventory.json`** = komplett maskinläsbar katalog över allt ovan (auto-genererad)
 - **ECC** (`_reference/ECC/`) = referens-arsenal (67 agenter, 271 skills, 92 kommandon) under utvärdering

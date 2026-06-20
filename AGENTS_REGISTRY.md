@@ -249,7 +249,7 @@ Output hamnar i `graphify-out/` och håller Graphify uppdaterat om alla agenter.
 
 > Genererad av `scripts/generate-inventory.js`. Maskinläsbar källa: `inventory.json`.
 
-**Totalt:** 108 skills · 29 agenter · 44 kommandon
+**Totalt:** 108 skills · 33 agenter · 44 kommandon
 
 ### Skills (108)
 
@@ -364,7 +364,7 @@ Output hamnar i `graphify-out/` och håller Graphify uppdaterat om alla agenter.
 | video-content-strategist | egen | Use when planning video content strategy, writing video scripts, optimizing YouTube channels, building short-form video pipelines (Reels, TikTok, Shorts), or repurposing long-form content into video. Triggers: 'start a YouTube channel', 'video content strategy', 'write a video script', 'repurpose into video', 'YouTube SEO', 'short-form video'. NOT for written blog content (use content-production). NOT for social captions without video (use social-media-manager). |
 | writing-hookify-rules | plugin:claude-plugins-official | This skill should be used when the user asks to "create a hookify rule", "write a hook rule", "configure hookify", "add a hookify rule", or needs guidance on hookify rule syntax and patterns. |
 
-### Agenter (29)
+### Agenter (33)
 
 | Name | Source | Description |
 |---|---|---|
@@ -384,6 +384,10 @@ Output hamnar i `graphify-out/` och håller Graphify uppdaterat om alla agenter.
 | content-writer | egen | LinkedIn-inlägg, podcast-script, copy, SEO-text och thought leadership för AI Upscale Agency. Använd när Mike vill skapa innehåll — inlägg, kurs-material, säljbrev, case studies, eller content till YouTube/podcast. |
 | conversation-analyzer | plugin:claude-plugins-official | Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks. Typical triggers include the /hookify command being invoked without arguments, or the user explicitly asking to look back at the current conversation and surface mistakes that should be prevented in the future. See "When to invoke" in the agent body for worked scenarios. |
 | deploy-agent | egen | Vercel + Docker + Hostinger deploys för Mikes projekt. Använd för att deploya ThyroidAI (Docker→VPS), Fluentic/landing pages (Vercel), eller köra smoke tests efter deploy. |
+| ecc-architect | egen | Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions. |
+| ecc-planner | egen | Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks. |
+| ecc-security-reviewer | egen | Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10 vulnerabilities. |
+| ecc-tdd-guide | egen | Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage. |
 | finance-bookkeeper | egen | Stripe-rapporter, MRR-tracking, fakturor, kostnadsöverblick, ekonomi-frågor. Använd för månatlig finance-brief, MRR-rapport, fakturahantering, eller kostnadsanalys (AI-API, Vercel, Hostinger, etc). |
 | legacy-analyst | plugin:claude-plugins-official | Deep-reads legacy codebases (COBOL, Java, .NET, Node, anything) to build structural and behavioral understanding. Use for discovery, dependency mapping, dead-code detection, and "what does this system actually do" questions. |
 | ops-daily | egen | Dagliga rutiner — kalender, mail-triage, briefs, fokus-planering. Använd för morning brief, end-of-day review, mail-zero, eller vecko-review mot Nordstjärnan. |
