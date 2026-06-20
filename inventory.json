@@ -1,0 +1,948 @@
+{
+  "generated": "2026-06-20T13:37:21.247Z",
+  "totals": {
+    "skills": 108,
+    "agents": 29,
+    "commands": 44
+  },
+  "skills": [
+    {
+      "name": "gstack",
+      "description": "Fast headless browser for QA testing and site dogfooding. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "aiupscale-closer",
+      "description": "Closer-roll för Mike's B2B-sälj. Skickar offerter, hanterar invändningar, bokar call-to-close, och stänger high-ticket affärer på AIOS-paket (14 900–69 900 kr/mån + Tripwire). Aktiveras vid \"skriv offert\", \"stäng affär\", \"hantera invändning\", \"skicka avtal\", \"follow-up close\".",
+      "source": "egen"
+    },
+    {
+      "name": "aiupscale-recruiter",
+      "description": "Recruiter-roll för Mike's AIOS. Värvar och bygger team av AI-agenter on demand baserat på uppgift. Aktiveras när Mike säger \"rekrytera agent X\", \"skapa team för Y\", \"vem ska göra Z\", eller liknande. Använder OpenClaw skill-creator för att spawna nya skills/agenter.",
+      "source": "egen"
+    },
+    {
+      "name": "aiupscale-researcher",
+      "description": "Research-roll för Mike's AIOS. Gör djup prospect-research, marknadsanalys, content-research och konkurrentanalys via web_fetch, web_search, browser och Perplexity. Aktiveras vid \"research X\", \"hitta info om Y\", \"kolla upp Z\", \"analysera marknaden\", \"konkurrent X\".",
+      "source": "egen"
+    },
+    {
+      "name": "aiupscale-sales",
+      "description": "Säljstrategi, outreach, pitch, pris och lead gen för AI Upscale Agency. Aktiveras när Mike jobbar med LinkedIn DMs, mail, offerter, demo-bokning eller nya leads. Följer familiarity-principen.",
+      "source": "egen"
+    },
+    {
+      "name": "app-store-optimization",
+      "description": "App Store Optimization (ASO) toolkit for researching keywords, analyzing competitor rankings, generating metadata suggestions, and improving app visibility on Apple App Store and Google Play Store. Use when the user asks about ASO, app store rankings, app metadata, app titles and descriptions, app store listings, app visibility, or mobile app marketing on iOS or Android. Supports keyword research and scoring, competitor keyword analysis, metadata optimization, A/B test planning, launch checklists, and tracking ranking changes.",
+      "source": "egen"
+    },
+    {
+      "name": "autoplan",
+      "description": "Auto-review pipeline — reads the full CEO, design, eng, and DX review skills from disk and runs them sequentially with auto-decisions using 6 decision principles. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "benchmark",
+      "description": "Performance regression detection using the browse daemon. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "benchmark-models",
+      "description": "Cross-model benchmark for gstack skills. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "browse",
+      "description": "Fast headless browser for QA testing and site dogfooding. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "canary",
+      "description": "Post-deploy canary monitoring. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "careful",
+      "description": "Safety guardrails for destructive commands. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ceo-advisor",
+      "description": "Executive leadership guidance for strategic decision-making, organizational development, and stakeholder management. Use when planning strategy, preparing board presentations, managing investors, developing organizational culture, making executive decisions, fundraising, or when user mentions CEO, strategic planning, board meetings, investor updates, organizational leadership, or executive strategy.",
+      "source": "egen"
+    },
+    {
+      "name": "codex",
+      "description": "OpenAI Codex CLI wrapper — three modes. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "cold-email",
+      "description": "When the user wants to write, improve, or build a sequence of B2B cold outreach emails to prospects who haven't asked to hear from them. Use when the user mentions 'cold email,' 'cold outreach,' 'prospecting emails,' 'SDR emails,' 'sales emails,' 'first touch email,' 'follow-up sequence,' or 'email prospecting.' Also use when they share an email draft that sounds too sales-y and needs to be humanized. Distinct from email-sequence (lifecycle/nurture to opted-in subscribers) — this is unsolicited outreach to new prospects. NOT for lifecycle emails, newsletters, or drip campaigns (use email-sequence).",
+      "source": "egen"
+    },
+    {
+      "name": "open-gstack-browser",
+      "description": "Launch GStack Browser — AI-controlled Chromium with the sidebar extension baked in.",
+      "source": "egen"
+    },
+    {
+      "name": "content-humanizer",
+      "description": "Makes AI-generated content sound genuinely human — not just cleaned up, but alive. Use when content feels robotic, uses too many AI clichés, lacks personality, or reads like it was written by committee. Triggers: 'this sounds like AI', 'make it more human', 'add personality', 'it feels generic', 'sounds robotic', 'fix AI writing', 'inject our voice'. NOT for initial content creation (use content-production). NOT for SEO optimization (use content-production Mode 3).",
+      "source": "egen"
+    },
+    {
+      "name": "context-restore",
+      "description": "Restore working context saved earlier by /context-save. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "context-save",
+      "description": "Save working context. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "cso",
+      "description": "Chief Security Officer mode. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "design-consultation",
+      "description": "Design consultation: understands your product, researches the landscape, proposes a complete design system (aesthetic, typography, color, layout, spacing, motion), and generates font+color preview... (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "design-html",
+      "description": "Design finalization: generates production-quality Pretext-native HTML/CSS. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "design-review",
+      "description": "Designer's eye QA: finds visual inconsistency, spacing issues, hierarchy problems, AI slop patterns, and slow interactions — then fixes them. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "design-shotgun",
+      "description": "Design shotgun: generate multiple AI design variants, open a comparison board, collect structured feedback, and iterate. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "devex-review",
+      "description": "Live developer experience audit. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "diagram",
+      "description": "Turn an English description (or mermaid source) into a diagram triplet: the source, an editable .excalidraw file you can open (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "document-generate",
+      "description": "Generate missing documentation from scratch for a feature, module, or entire project. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "document-release",
+      "description": "Post-ship documentation update. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "freeze",
+      "description": "Restrict file edits to a specific directory for the session. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "graphify",
+      "description": "Use for any question about a codebase, its architecture, file relationships, or project content — especially when graphify-out/ exists, where the question should be treated as a graphify query first. Turns any input (code, docs, papers, images, videos) into a persistent knowledge graph with god nodes, community detection, and query/path/explain tools.",
+      "source": "egen"
+    },
+    {
+      "name": "gstack",
+      "description": "Fast headless browser for QA testing and site dogfooding. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "gstack-upgrade",
+      "description": "Upgrade gstack to the latest version.",
+      "source": "egen"
+    },
+    {
+      "name": "guard",
+      "description": "Full safety mode: destructive command warnings + directory-scoped edits. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "health",
+      "description": "Code quality dashboard. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "investigate",
+      "description": "Systematic debugging with root cause investigation. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ios-clean",
+      "description": "Remove the DebugBridge SPM package and all #if DEBUG wiring from an iOS app. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ios-design-review",
+      "description": "Visual design audit for iOS apps on real hardware. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ios-fix",
+      "description": "Autonomous iOS bug fixer. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ios-qa",
+      "description": "Live-device iOS QA for SwiftUI apps. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ios-sync",
+      "description": "Regenerate the iOS debug bridge against the latest upstream gstack templates. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "karpathy-ai-upscale",
+      "description": "Karpathy-principer anpassade för AI Upscale Agency + Mike. Aktiveras automatiskt vid kodning, refactoring, eller code review för att minska vanliga LLM-misstag som överkomplikation, tysta antaganden och icke-kirurgiska ändringar.",
+      "source": "egen"
+    },
+    {
+      "name": "land-and-deploy",
+      "description": "Land and deploy workflow. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "landing-report",
+      "description": "Read-only queue dashboard for workspace-aware ship. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "learn",
+      "description": "Manage project learnings.",
+      "source": "egen"
+    },
+    {
+      "name": "llm-council",
+      "description": "Run any question, idea, or decision through a council of 5 AI advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict. Based on Karpathy's LLM Council methodology. MANDATORY TRIGGERS: 'council this', 'run the council', 'war room this', 'pressure-test this', 'stress-test this', 'debate this'. STRONG TRIGGERS (use when combined with a real decision or tradeoff): 'should I X or Y', 'which option', 'what would you do', 'is this the right move', 'validate this', 'get multiple perspectives', 'I can't decide', 'I'm torn between'. Do NOT trigger on simple yes/no questions, factual lookups, or casual 'should I' without a meaningful tradeoff (e.g. 'should I use markdown' is not a council question). DO trigger when the user presents a genuine decision with stakes, multiple options, and context that suggests they want it pressure-tested from multiple angles.",
+      "source": "egen"
+    },
+    {
+      "name": "make-pdf",
+      "description": "Turn any markdown file into a publication-quality PDF. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "mike-adhd-shield",
+      "description": "Skyddar Mikes fokus och energi. Aktiveras AUTOMATISKT när task-listor, planer eller dokument blir för långa (>5 punkter), när det finns för många parallella spår, eller när Mike visar tecken på överbelastning (\"hjälp\", \"för mycket\", \"kan inte fokusera\", \"vart börjar jag\"). Skär ner till max 3-5 saker, skyddar dopamin-rytmen.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-aios-master",
+      "description": "Master-kontext om Mike, AI Upscale Agency. Lean version optimerad för Ollama gemma4 16K context. Aktiveras automatiskt i ai_upscale_work/.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-content-voice",
+      "description": "Mikes röst- och tonalitetsregler för ALLT innehåll — LinkedIn-inlägg, podcast-script, kurs-material, säljbrev, hemsidor. Aktiveras AUTOMATISKT vid content-skapande. Förbjudna fraser, hooks som funkar, struktur-regler, ADHD-anpassning. Säkrar att inget content låter som AI.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-context-refresh",
+      "description": "Vid sessionsstart eller när Mike säger \"vad är status\", \"refresh\", \"vad finns\", \"uppdatera kontext\", \"var är jag\" — kör en levande kontext-uppdatering. Läser git log (senaste 7 dagar), kollar projekt-status, varnar för stale memory (>14 dagar). Säkrar att Claude inte refererar gammal info.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-deploy-process",
+      "description": "Hela deploy-flödet för Mikes projekt (ThyroidAI, Fluentic, AIOS_Core, landing pages). Aktiveras AUTOMATISKT när Mike säger \"deploy\", \"deploya\", \"publicera\", \"ship\", \"release\", \"rollback\". Kör pre-flight checklist, deploy, smoke tests, log och notifiering. Aldrig deploy utan checklist.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-llm-routing",
+      "description": "När Mike eller Claude står inför ett LLM-val (Claude, Gemini, Perplexity, OpenAI) — visar exakt pris per uppgift, rekommendation och motivering INNAN val. Aktiveras vid \"vilken LLM\", \"byt modell\", \"kan vi använda X\", \"kostnad för Y\", eller när nytt agent-anrop ska göras.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-onboarding-b2b",
+      "description": "Hela onboarding-flödet för ny B2B-kund (Tripwire/Starter/Growth/Full AI OS). Aktiveras vid \"ny kund\", \"signed\", \"stängde X\", \"onboarding för Y\", \"kick-off\". Standardiserar varje onboarding så Mike aldrig glömmer ett steg — kontrakt → setup → kick-off → leverans → reporting.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-pipeline-health",
+      "description": "Hälsoanalys av Mikes sales pipeline. Aktiveras vid \"pipeline\", \"leads\", \"sales-status\", \"hur går säljet\", \"vart är vi mot MRR-målet\", \"vem är nästa att stänga\". Identifierar flaskhalsar, varma leads, dunstande prospects och rekommenderar konkret nästa steg.",
+      "source": "egen"
+    },
+    {
+      "name": "mike-roi-gate",
+      "description": "När Mike eller Claude föreslår en ny idé, feature, projekt, verktyg eller process — kör 80/20 + ROI-check FÖRE Mike investerar tid. Aktiveras vid \"ska jag bygga X\", \"vad tycker du om Y\", \"borde vi köra Z\", \"ny idé\", \"nytt verktyg\". Skyddar Mikes mest värdefulla resurs: tid.",
+      "source": "egen"
+    },
+    {
+      "name": "office-hours",
+      "description": "YC Office Hours — two modes. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "open-gstack-browser",
+      "description": "Launch GStack Browser — AI-controlled Chromium with the sidebar extension baked in.",
+      "source": "egen"
+    },
+    {
+      "name": "pair-agent",
+      "description": "Pair a remote AI agent with your browser. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "plan-ceo-review",
+      "description": "CEO/founder-mode plan review. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "plan-design-review",
+      "description": "Designer's eye plan review — interactive, like CEO and Eng review. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "plan-devex-review",
+      "description": "Interactive developer experience plan review. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "plan-eng-review",
+      "description": "Eng manager-mode plan review. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "plan-tune",
+      "description": "Self-tuning question sensitivity + developer psychographic for gstack (v1: observational). (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "podcast-create",
+      "description": "Skapa podcast-avsnitt automatiskt via NotebookLM (notebooklm-py CLI). Aktiveras när Mike säger \"skapa podcast om X\", \"make podcast about X\", \"nytt podcast-avsnitt\", eller liknande. Bygger script via Gemini, genererar audio, sparar lokalt, ger Spotify-redo MP3.",
+      "source": "egen"
+    },
+    {
+      "name": "qa",
+      "description": "Systematically QA test a web application and fix bugs found. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "qa-only",
+      "description": "Report-only QA testing. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "remotion",
+      "description": "Skapa videos programmatiskt med Remotion + React. Aktiveras när Mike vill skapa, rendera, validera eller extrahera frames från video — speciellt för ThyroidAI launch-video, YouTube 4 Kids, content-templates, eller andra projekt. Triggers - \"skapa video\", \"rendera video\", \"remotion\", \"thyroidai video\", \"youtube video\", \"extract frames\", \"validate video\", \"video script + remotion\". Använder Mikes lokala Remotion-projekt på Desktop.",
+      "source": "egen"
+    },
+    {
+      "name": "retro",
+      "description": "Weekly engineering retrospective. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "review",
+      "description": "Pre-landing PR review. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "scrape",
+      "description": "Pull data from a web page. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "setup-browser-cookies",
+      "description": "Import cookies from your real Chromium browser into the headless browse session. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "setup-deploy",
+      "description": "Configure deployment settings for /land-and-deploy.",
+      "source": "egen"
+    },
+    {
+      "name": "setup-gbrain",
+      "description": "Set up gbrain for this coding agent: install the CLI, initialize a local PGLite or Supabase brain, register MCP, capture per-remote trust policy. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "ship",
+      "description": "Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "skillify",
+      "description": "Codify the most recent successful /scrape flow into a permanent browser-skill on disk. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "social-media-manager",
+      "description": "When the user wants to develop social media strategy, plan content calendars, manage community engagement, or grow their social presence across platforms. Also use when the user mentions 'social media strategy,' 'social calendar,' 'community management,' 'social media plan,' 'grow followers,' 'engagement rate,' 'social media audit,' or 'which platforms should I use.' For writing individual social posts, see social-content. For analyzing social performance data, see social-media-analyzer.",
+      "source": "egen"
+    },
+    {
+      "name": "spec",
+      "description": "Turn vague intent into a precise, executable spec in five phases. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "sync-gbrain",
+      "description": "Keep gbrain current with this repo's code and refresh agent search guidance in CLAUDE.md. Wraps the gstack-gbrain-sync orchestrator with state (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "unfreeze",
+      "description": "Clear the freeze boundary set by /freeze, allowing edits to all directories again. (gstack)",
+      "source": "egen"
+    },
+    {
+      "name": "video-content-strategist",
+      "description": "Use when planning video content strategy, writing video scripts, optimizing YouTube channels, building short-form video pipelines (Reels, TikTok, Shorts), or repurposing long-form content into video. Triggers: 'start a YouTube channel', 'video content strategy', 'write a video script', 'repurpose into video', 'YouTube SEO', 'short-form video'. NOT for written blog content (use content-production). NOT for social captions without video (use social-media-manager).",
+      "source": "egen"
+    },
+    {
+      "name": "access",
+      "description": "Manage Discord channel access — approve pairings, edit allowlists, set DM/group policy. Use when the user asks to pair, approve someone, check who's allowed, or change policy for the Discord channel.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "configure",
+      "description": "Set up the Discord channel — save the bot token and review access policy. Use when the user pastes a Discord bot token, asks to configure Discord, asks \"how do I set this up\" or \"who can reach me,\" or wants to check channel status.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "access",
+      "description": "Manage iMessage channel access — approve pairings, edit allowlists, set DM/group policy. Use when the user asks to pair, approve someone, check who's allowed, or change policy for the iMessage channel.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "configure",
+      "description": "Check iMessage channel setup and review access policy. Use when the user asks to configure iMessage, asks \"how do I set this up\" or \"who can reach me,\" or wants to know why texts aren't reaching the assistant.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "access",
+      "description": "Manage Telegram channel access — approve pairings, edit allowlists, set DM/group policy. Use when the user asks to pair, approve someone, check who's allowed, or change policy for the Telegram channel.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "configure",
+      "description": "Set up the Telegram channel — save the bot token and review access policy. Use when the user pastes a Telegram bot token, asks to configure Telegram, asks \"how do I set this up\" or \"who can reach me,\" or wants to check channel status.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "claude-automation-recommender",
+      "description": "Analyze a codebase and recommend Claude Code automations (hooks, subagents, skills, plugins, MCP servers). Use when user asks for automation recommendations, wants to optimize their Claude Code setup, mentions improving Claude Code workflows, asks how to first set up Claude Code for a project, or wants to know what Claude Code features they should use.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "claude-md-improver",
+      "description": "Audit and improve CLAUDE.md files in repositories. Use when user asks to check, audit, update, improve, or fix CLAUDE.md files. Scans for all CLAUDE.md files, evaluates quality against templates, outputs quality report, then makes targeted updates. Also use when the user mentions \"CLAUDE.md maintenance\" or \"project memory optimization\".",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "cardputer-buddy",
+      "description": "Iterate on the Cardputer-Adv MicroPython app bundle (Claude Buddy, Snake, Hello) after the device is already provisioned via m5-onboard. Use when the user wants to add a new app, push a single changed .py without re-flashing, watch device serial logs, or run a one-shot REPL command. Trigger on \"add an app\", \"push to the cardputer\", \"tail the device\", \"run on the device\", or follow-up work after /maker-setup.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "m5-onboard",
+      "description": "End-to-end onboarding for a freshly-plugged-in M5Stack ESP32 device (Cardputer, Cardputer-Adv, Core, CoreS3, Stick) — detect on USB, flash UIFlow 2.0 firmware, and install the Claude Buddy MicroPython app bundle. Use whenever the user plugs in or wants to flash/provision/reset an M5Stack or ESP32 board, or says \"m5-onboard go\".",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "example-command",
+      "description": "An example user-invoked skill that demonstrates frontmatter options and the skills/<name>/SKILL.md layout",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "example-skill",
+      "description": "This skill should be used when the user asks to \"demonstrate skills\", \"show skill format\", \"create a skill template\", or discusses skill development patterns. Provides a reference template for creating Claude Code plugin skills.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "frontend-design",
+      "description": "Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "writing-hookify-rules",
+      "description": "This skill should be used when the user asks to \"create a hookify rule\", \"write a hook rule\", \"configure hookify\", \"add a hookify rule\", or needs guidance on hookify rule syntax and patterns.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "math-olympiad",
+      "description": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "build-mcp-app",
+      "description": "This skill should be used when the user wants to build an \"MCP app\", add \"interactive UI\" or \"widgets\" to an MCP server, \"render components in chat\", build \"MCP UI resources\", make a tool that shows a \"form\", \"picker\", \"dashboard\" or \"confirmation dialog\" inline in the conversation, or mentions \"apps SDK\" in the context of MCP. Use AFTER the build-mcp-server skill has settled the deployment model, or when the user already knows they want UI widgets.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "build-mcp-server",
+      "description": "This skill should be used when the user asks to \"build an MCP server\", \"create an MCP\", \"make an MCP integration\", \"wrap an API for Claude\", \"expose tools to Claude\", \"make an MCP app\", or discusses building something with the Model Context Protocol. It is the entry point for MCP server development — it interrogates the user about their use case, determines the right deployment model (remote HTTP, MCPB, local stdio), picks a tool-design pattern, and hands off to specialized skills.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "build-mcpb",
+      "description": "This skill should be used when the user wants to \"package an MCP server\", \"bundle an MCP\", \"make an MCPB\", \"ship a local MCP server\", \"distribute a local MCP\", discusses \".mcpb files\", mentions bundling a Node or Python runtime with their MCP server, or needs an MCP server that interacts with the local filesystem, desktop apps, or OS and must be installable without the user having Node/Python set up.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "playground",
+      "description": "Creates interactive HTML playgrounds — self-contained single-file explorers that let users configure something visually through controls, see a live preview, and copy out a prompt. Use when the user asks to make a playground, explorer, or interactive tool for a topic.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "agent-development",
+      "description": "This skill should be used when the user asks to \"create an agent\", \"add an agent\", \"write a subagent\", \"agent frontmatter\", \"when to use description\", \"agent examples\", \"agent tools\", \"agent colors\", \"autonomous agent\", or needs guidance on agent structure, system prompts, triggering conditions, or agent development best practices for Claude Code plugins.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "command-development",
+      "description": "This skill should be used when the user asks to \"create a slash command\", \"add a command\", \"write a custom command\", \"define command arguments\", \"use command frontmatter\", \"organize commands\", \"create command with file references\", \"interactive command\", \"use AskUserQuestion in command\", or needs guidance on slash command structure, YAML frontmatter fields, dynamic arguments, bash execution in commands, user interaction patterns, or command development best practices for Claude Code.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "hook-development",
+      "description": "This skill should be used when the user asks to \"create a hook\", \"add a PreToolUse/PostToolUse/Stop hook\", \"validate tool use\", \"implement prompt-based hooks\", \"use ${CLAUDE_PLUGIN_ROOT}\", \"set up event-driven automation\", \"block dangerous commands\", or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "mcp-integration",
+      "description": "This skill should be used when the user asks to \"add MCP server\", \"integrate MCP\", \"configure MCP in plugin\", \"use .mcp.json\", \"set up Model Context Protocol\", \"connect external service\", mentions \"${CLAUDE_PLUGIN_ROOT} with MCP\", or discusses MCP server types (SSE, stdio, HTTP, WebSocket). Provides comprehensive guidance for integrating Model Context Protocol servers into Claude Code plugins for external tool and service integration.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "plugin-settings",
+      "description": "This skill should be used when the user asks about \"plugin settings\", \"store plugin configuration\", \"user-configurable plugin\", \".local.md files\", \"plugin state files\", \"read YAML frontmatter\", \"per-project plugin settings\", or wants to make plugin behavior configurable. Documents the .claude/plugin-name.local.md pattern for storing plugin-specific configuration with YAML frontmatter and markdown content.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "plugin-structure",
+      "description": "This skill should be used when the user asks to \"create a plugin\", \"scaffold a plugin\", \"understand plugin structure\", \"organize plugin components\", \"set up plugin.json\", \"use ${CLAUDE_PLUGIN_ROOT}\", \"add commands/agents/skills/hooks\", \"configure auto-discovery\", or needs guidance on plugin directory layout, manifest configuration, component organization, file naming conventions, or Claude Code plugin architecture best practices.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "skill-development",
+      "description": "This skill should be used when the user wants to \"create a skill\", \"add a skill to plugin\", \"write a new skill\", \"improve skill description\", \"organize skill content\", or needs guidance on skill structure, progressive disclosure, or skill development best practices for Claude Code plugins.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "session-report",
+      "description": "Generate an explorable HTML report of Claude Code session usage (tokens, cache, subagents, skills, expensive prompts) from ~/.claude/projects transcripts.",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "skill-creator",
+      "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
+      "source": "plugin:claude-plugins-official"
+    }
+  ],
+  "agents": [
+    {
+      "name": "code-reviewer-aios",
+      "description": "Code review för Mikes stack (Next.js 15, TypeScript, Docker, Supabase, Capacitor). Använd FÖRE commit/PR av icke-triviala ändringar i AIOS_Core, ThyroidAI, Fluentic eller andra TS-projekt.",
+      "tools": "Read, Grep, Glob, Bash",
+      "source": "egen"
+    },
+    {
+      "name": "content-writer",
+      "description": "LinkedIn-inlägg, podcast-script, copy, SEO-text och thought leadership för AI Upscale Agency. Använd när Mike vill skapa innehåll — inlägg, kurs-material, säljbrev, case studies, eller content till YouTube/podcast.",
+      "tools": "WebFetch, WebSearch, Read, Write, Edit, Bash",
+      "source": "egen"
+    },
+    {
+      "name": "deploy-agent",
+      "description": "Vercel + Docker + Hostinger deploys för Mikes projekt. Använd för att deploya ThyroidAI (Docker→VPS), Fluentic/landing pages (Vercel), eller köra smoke tests efter deploy.",
+      "tools": "Bash, Read, Grep",
+      "source": "egen"
+    },
+    {
+      "name": "finance-bookkeeper",
+      "description": "Stripe-rapporter, MRR-tracking, fakturor, kostnadsöverblick, ekonomi-frågor. Använd för månatlig finance-brief, MRR-rapport, fakturahantering, eller kostnadsanalys (AI-API, Vercel, Hostinger, etc).",
+      "tools": "Bash, Read, Write, WebFetch",
+      "source": "egen"
+    },
+    {
+      "name": "ops-daily",
+      "description": "Dagliga rutiner — kalender, mail-triage, briefs, fokus-planering. Använd för morning brief, end-of-day review, mail-zero, eller vecko-review mot Nordstjärnan.",
+      "tools": "Read, Write, Bash, WebFetch",
+      "source": "egen"
+    },
+    {
+      "name": "sales-prospector",
+      "description": "LinkedIn-research + lead scoring + outreach-kö. Använd för att hitta VD/COO/Grundare på ICP-företag (5-50 anst, SaaS/konsult/rekrytering/fastighet/byråer, Sverige+Norge), scora leads, och bygga familiarity-loop-listor (Like → Comment → Connect → DM → Call).",
+      "tools": "WebFetch, WebSearch, Bash, Read, Write, Edit",
+      "source": "egen"
+    },
+    {
+      "name": "agent-sdk-verifier-py",
+      "description": "Use this agent to verify that a Python Agent SDK application is properly configured, follows SDK best practices and documentation recommendations, and is ready for deployment or testing. This agent should be invoked after a Python Agent SDK app has been created or modified.",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "agent-sdk-verifier-ts",
+      "description": "Use this agent to verify that a TypeScript Agent SDK application is properly configured, follows SDK best practices and documentation recommendations, and is ready for deployment or testing. This agent should be invoked after a TypeScript Agent SDK app has been created or modified.",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "architecture-critic",
+      "description": "Reviews proposed target architectures and transformed code against modern best practice. Adversarial — looks for over-engineering, missed requirements, and simpler alternatives.",
+      "tools": "Read, Glob, Grep, Bash",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "business-rules-extractor",
+      "description": "Mines domain logic, calculations, validations, and policies from legacy code into testable Given/When/Then specifications. Use when you need to separate \"what the business requires\" from \"how the old code happened to implement it.",
+      "tools": "Read, Glob, Grep, Bash",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "legacy-analyst",
+      "description": "Deep-reads legacy codebases (COBOL, Java, .NET, Node, anything) to build structural and behavioral understanding. Use for discovery, dependency mapping, dead-code detection, and \"what does this system actually do\" questions.",
+      "tools": "Read, Glob, Grep, Bash",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "scaffolder",
+      "description": "Scaffolds one service of a reimagined system from the approved architecture and spec — project skeleton, domain model, API stubs, executable acceptance tests. Write access is scoped to its own service directory under modernized/.",
+      "tools": "Read, Glob, Grep, Write, Edit, Bash",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "security-auditor",
+      "description": "Adversarial security reviewer — OWASP Top 10, CWE, dependency CVEs, secrets, injection. Use for security debt scanning and pre-modernization hardening.",
+      "tools": "Read, Glob, Grep, Bash",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "test-engineer",
+      "description": "Writes characterization, contract, and equivalence tests that pin down legacy behavior so transformation can be proven correct. Use before any rewrite.",
+      "tools": "Read, Write, Edit, Glob, Grep, Bash",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "version-delta-analyst",
+      "description": "Identifies the breaking changes between two versions of the SAME stack (e.g. .NET Framework 4.8 → .NET 8, Java 8 → 17/21, Spring Boot 2 → 3) that actually bite a given codebase, and drives the ecosystem's migration tooling. Use for same-stack uplifts, where code is preserved and tweaked — not rewritten from intent. (Note: some \"same-stack\" bumps are really rewrites — Python 2 → 3 with pervasive str/bytes, AngularJS → Angular — where minimal-diff fails; flag those for /modernize-transform.)",
+      "tools": "Read, Glob, Grep, Bash",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "code-simplifier",
+      "description": "Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses on recently modified code unless instructed otherwise.",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "code-architect",
+      "description": "Designs feature architectures by analyzing existing codebase patterns and conventions, then providing comprehensive implementation blueprints with specific files to create/modify, component designs, data flows, and build sequences",
+      "tools": "Glob, Grep, LS, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, KillShell, BashOutput",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "code-explorer",
+      "description": "Deeply analyzes existing codebase features by tracing execution paths, mapping architecture layers, understanding patterns and abstractions, and documenting dependencies to inform new development",
+      "tools": "Glob, Grep, LS, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, KillShell, BashOutput",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "code-reviewer",
+      "description": "Reviews code for bugs, logic errors, security vulnerabilities, code quality issues, and adherence to project conventions, using confidence-based filtering to report only high-priority issues that truly matter",
+      "tools": "Glob, Grep, LS, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, KillShell, BashOutput",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "conversation-analyzer",
+      "description": "Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks. Typical triggers include the /hookify command being invoked without arguments, or the user explicitly asking to look back at the current conversation and surface mistakes that should be prevented in the future. See \"When to invoke\" in the agent body for worked scenarios.",
+      "tools": "[\"Read\", \"Grep\"]",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "agent-creator",
+      "description": "|",
+      "tools": "[\"Write\", \"Read\"]",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "plugin-validator",
+      "description": "|",
+      "tools": "[\"Read\", \"Grep\", \"Glob\", \"Bash\"]",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "skill-reviewer",
+      "description": "|",
+      "tools": "[\"Read\", \"Grep\", \"Glob\"]",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "code-reviewer",
+      "description": "Use this agent when you need to review code for adherence to project guidelines, style guides, and best practices. This agent should be used proactively after writing or modifying code, especially before committing changes or creating pull requests. It will check for style violations, potential issues, and ensure code follows the established patterns in CLAUDE.md. Also the agent needs to know which files to focus on for the review. In most cases this will be recently completed work which is unstaged in git (can be retrieved by running git diff). However there can be cases where this is different, make sure to specify this as the agent input when calling the agent. Typical triggers include the user asking for a review of a feature they just implemented, the assistant proactively reviewing its own newly-written code before declaring a task done, and a final pre-PR check before opening a pull request. See \"When to invoke\" in the agent body for worked scenarios.",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "code-simplifier",
+      "description": "|",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "comment-analyzer",
+      "description": "Use this agent when you need to analyze code comments for accuracy, completeness, and long-term maintainability. This includes (1) after generating large documentation comments or docstrings, (2) before finalizing a pull request that adds or modifies comments, (3) when reviewing existing comments for potential technical debt or comment rot, and (4) when you need to verify that comments accurately reflect the code they describe. See \"When to invoke\" in the agent body for worked scenarios.",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "pr-test-analyzer",
+      "description": "Use this agent when you need to review a pull request for test coverage quality and completeness. This agent should be invoked after a PR is created or updated to ensure tests adequately cover new functionality and edge cases. Typical triggers include the user asking whether tests on a freshly-created PR are thorough, an updated PR adding new logic that needs coverage analysis, and a final pre-merge double-check before marking a PR ready. See \"When to invoke\" in the agent body for worked scenarios.",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "silent-failure-hunter",
+      "description": "Use this agent when reviewing code changes in a pull request to identify silent failures, inadequate error handling, and inappropriate fallback behavior. This agent should be invoked proactively after completing a logical chunk of work that involves error handling, catch blocks, fallback logic, or any code that could potentially suppress errors. Examples:\\n\\n<example>\\nContext: Daisy has just finished implementing a new feature that fetches data from an API with fallback behavior.\\nDaisy: \"I've added error handling to the API client. Can you review it?\"\\nAssistant: \"Let me use the silent-failure-hunter agent to thoroughly examine the error handling in your changes.\"\\n<Task tool invocation to launch silent-failure-hunter agent>\\n</example>\\n\\n<example>\\nContext: Daisy has created a PR with changes that include try-catch blocks.\\nDaisy: \"Please review PR #1234\"\\nAssistant: \"I'll use the silent-failure-hunter agent to check for any silent failures or inadequate error handling in this PR.\"\\n<Task tool invocation to launch silent-failure-hunter agent>\\n</example>\\n\\n<example>\\nContext: Daisy has just refactored error handling code.\\nDaisy: \"I've updated the error handling in the authentication module\"\\nAssistant: \"Let me proactively use the silent-failure-hunter agent to ensure the error handling changes don't introduce silent failures.\"\\n<Task tool invocation to launch silent-failure-hunter agent>\\n</example>",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "type-design-analyzer",
+      "description": "Use this agent when you need expert analysis of type design in your codebase. Specifically use it (1) when introducing a new type to ensure it follows best practices for encapsulation and invariant expression, (2) during pull request creation to review all types being added, and (3) when refactoring existing types to improve their design quality. The agent will provide both qualitative feedback and quantitative ratings on encapsulation, invariant expression, usefulness, and enforcement. See \"When to invoke\" in the agent body for worked scenarios.",
+      "tools": "",
+      "source": "plugin:claude-plugins-official"
+    }
+  ],
+  "commands": [
+    {
+      "name": "cold-dm",
+      "summary": "Skriv kallt LinkedIn-DM efter familiarity-loop (Like + Comment + Connect).",
+      "source": "egen"
+    },
+    {
+      "name": "daglig-brief",
+      "summary": "Ge mig en daglig brief baserad på mina projekt i CLAUDE.md.",
+      "source": "egen"
+    },
+    {
+      "name": "deploy-thyroid",
+      "summary": "Deploya ThyroidAI till Hostinger VPS (76.13.149.231).",
+      "source": "egen"
+    },
+    {
+      "name": "eod-brief",
+      "summary": "End-of-day brief för Mike. Max 10 rader.",
+      "source": "egen"
+    },
+    {
+      "name": "follow-up",
+      "summary": "Skapa follow-up efter call eller DM-konversation.",
+      "source": "egen"
+    },
+    {
+      "name": "linkedin-post",
+      "summary": "Skapa LinkedIn-inlägg för Mike Luengo Johansson (grundare AI Upscale Agency).",
+      "source": "egen"
+    },
+    {
+      "name": "offert",
+      "summary": "Generera kundoffert för AI Upscale Agency.",
+      "source": "egen"
+    },
+    {
+      "name": "outreach",
+      "summary": "Hjälp mig med LinkedIn outreach baserat på familiarity-principen.",
+      "source": "egen"
+    },
+    {
+      "name": "pipeline",
+      "summary": "Sammanställ sales pipeline för AI Upscale Agency.",
+      "source": "egen"
+    },
+    {
+      "name": "podcast",
+      "summary": "Skapa podcast-avsnitt via NotebookLM (delegera till skill `podcast-create`).",
+      "source": "egen"
+    },
+    {
+      "name": "refresh",
+      "summary": "Uppdatera memory mot aktuell verklighet. Aktivera skill `mike-context-refresh` o",
+      "source": "egen"
+    },
+    {
+      "name": "research-prospect",
+      "summary": "Djupresearch ett prospect (företag eller person) för säljpipeline.",
+      "source": "egen"
+    },
+    {
+      "name": "sprint",
+      "summary": "ADHD-vänlig sprint-plan. Bryt ner ett mål i max 5 konkreta tasks.",
+      "source": "egen"
+    },
+    {
+      "name": "status",
+      "summary": "Visa fullständig översikt av Mikes Claude-setup. Aktivera skill `mike-context-re",
+      "source": "egen"
+    },
+    {
+      "name": "weekly-review",
+      "summary": "Vecko-review mot Nordstjärnan. Söndag kväll-ritual.",
+      "source": "egen"
+    },
+    {
+      "name": "new-sdk-app",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "revise-claude-md",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-assess",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-brief",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-extract-rules",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-harden",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-map",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-preflight",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-reimagine",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-status",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-transform",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "modernize-uplift",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "code-review",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "clean_gone",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "commit-push-pr",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "commit",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "maker-setup",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "example-command",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "feature-dev",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "configure",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "help",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "hookify",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "list",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "create-docker-mcp-tunnel",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "create-plugin",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "review-pr",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "cancel-ralph",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "help",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    },
+    {
+      "name": "ralph-loop",
+      "summary": "",
+      "source": "plugin:claude-plugins-official"
+    }
+  ]
+}

@@ -31,11 +31,13 @@ Detta är min centrala "kontrollpanel". Härifrån vill jag styra alla mina proj
 | **Knowledge Graph / Master Brain / Memory Galaxy** | 2D-grafer (D3 + vis.js) via iframe |
 | **AIOS Constellation** (under bygge) | 3D-graf (3d-force-graph/Three.js) över hela systemet |
 
-**Mina resurser som ska in i systemet:**
+**Mina resurser som ska in i systemet** (full katalog: `inventory.json`):
 - **16 projekt** (ThyroidAI, Byggflow, Infrea, AF-SIUS, CEO with ADHD, Cluee, Fluentic m.fl.)
-- **69 skills** (`~/.claude/skills/*/SKILL.md`)
-- **6 bas-agenter** + multi-agent-frameworks (ruflo, llm-council) → 60+ agent-instanser
-- **15 kommandon**, **9 contexts**, registries (`REGISTRY.md`, `PROJECTS_REGISTRY.md`, `AGENTS_REGISTRY.md`)
+- **108 skills** (80 egna + 28 plugin) — `~/.claude/skills/` + `~/.claude/plugins/`
+- **29 agenter** (6 egna + 23 plugin) + multi-agent-frameworks (ruflo, llm-council)
+- **44 kommandon** (15 egna + 29 plugin), **9 contexts**, registries (`REGISTRY.md`, `PROJECTS_REGISTRY.md`, `AGENTS_REGISTRY.md`)
+- **`inventory.json`** = komplett maskinläsbar katalog över allt ovan (auto-genererad)
+- **ECC** (`_reference/ECC/`) = referens-arsenal (67 agenter, 271 skills, 92 kommandon) under utvärdering
 
 ---
 
@@ -107,4 +109,31 @@ Detta är min centrala "kontrollpanel". Härifrån vill jag styra alla mina proj
 
 ---
 
-*Skickat av Mike för att starta Google Cloud-uppsättningen. Allt källmaterial finns i `~/ai_upscale_work/` + GitHub `aiupscaleagency-max/agent-os`.*
+## 8. Setup-checklista för Cloud Shell (kör FÖRST)
+
+Gemini — kör dessa i Cloud Shell-terminalen innan något byggs:
+
+```bash
+# 1. Hämta senaste från repot (få med denna fil + inventory.json)
+cd ~/ai-upscale-work && git pull
+
+# 2. Verifiera att rätt GCP-projekt är valt
+gcloud config get-value project
+
+# 3. Verifiera att billing är kopplat (krävs för Cloud Run/Firestore)
+gcloud billing projects describe $(gcloud config get-value project) 2>/dev/null || echo "⚠️ Billing ej kopplat — koppla i Console först"
+
+# 4. Slå på de API:er vi behöver
+gcloud services enable run.googleapis.com firestore.googleapis.com \
+  cloudscheduler.googleapis.com cloudtasks.googleapis.com \
+  aiplatform.googleapis.com secretmanager.googleapis.com
+
+# 5. Läs full katalog över allt jag har
+cat inventory.json | head -50
+```
+
+Om något i steg 2–3 saknas → säg till Mike, bygg inget förrän det är löst.
+
+---
+
+*Skickat av Mike för att starta Google Cloud-uppsättningen. Allt källmaterial finns i `~/ai_upscale_work/` (= GitHub `aiupscaleagency-max/ai-upscale-work`). Systemet `agent-os` har egen backup på `aiupscaleagency-max/agent-os`.*
