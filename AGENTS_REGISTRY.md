@@ -10,6 +10,19 @@ summary: Komplett karta över ALLA agenter, skills och multi-agent frameworks.
 
 ---
 
+## ☁️ MOLN-AGENTER (GCP / Cyber Guardian) — manuellt underhållen
+
+> Körs i Google Cloud (projekt `cyber-guardian-32596`), inte som filer i `~/.claude`.
+> Lägg nya moln-agenter HÄR (ovanför auto-blocket) så generatorn inte skriver över dem.
+
+| Agent | Roll | Funktion |
+|---|---|---|
+| `cyber-guardian` | Security & Orchestrator | Säkerhet + vaktpost för Agentic OS (AURA-hjärna, Cloud Run) |
+| `infrastructure-manager` | GCP Cloud Architect | Terraform, Cloud Run, Secret Manager |
+| `service-agent` | Operations Manager | Driftstatus, kundsupport, loggar i molnet |
+
+---
+
 ## SNABBVAL: Vilket ramverk för vad?
 
 | Situation | Använd |
