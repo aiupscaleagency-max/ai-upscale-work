@@ -27,19 +27,19 @@
 | 2 | **ThyroidAI Marketing Video** | `Customer_Projects/ThyroidAI : Läkarteamet/ThyroidAI-Marketing-Video/` | (sub-projekt) | 🟡 PÅGÅR | Launch-video för ThyroidAI |
 | 3 | **Fluentic-AI** | `fluentic-ai/` | `fluentic-ai` (public) | 🟡 PÅGÅR | Mikes språkapp (es/en/fr/ar) |
 | 4 | **AIOS_Core** | `AIOS_Core/` | `AIOS_Core` | 🟡 PÅGÅR | Mikes egna AIOS |
-| 5 | **AIOS_Core_landing** | `AIOS_Core_landing/` | ❌ **SAKNAS** | 🟡 LIVE? | Landningssida för AIOS |
-| 6 | **ByggFlow** | `Customer_Projects/ByggFlow/` | ❌ **SAKNAS** | 🟢 KLAR | AIOS för hantverk |
-| 7 | **Infrea-Insight** | `Customer_Projects/Infrea-Insight/` | ❌ **SAKNAS** | 🟢 KLAR | Uppgraderad Byggflow |
+| 5 | **AIOS_Core_landing** | `AIOS_Core_landing/` | `AIOS_Core_landing` | 🟡 LIVE? | Landningssida för AIOS |
+| 6 | **ByggFlow** | `Customer_Projects/ByggFlow/` | `byggflow` | 🟢 KLAR | AIOS för hantverk |
+| 7 | **Infrea-Insight** | `Customer_Projects/Infrea-Insight/` | `infrea-insight` | 🟢 KLAR | Uppgraderad Byggflow |
 | 8 | **AF-SIUS** | `Customer_Projects/Af-SIUS/` | `arbetsformedlingen-ai` ⚠️ | 🟡 PÅGÅR | Egen produkt (Arbetsförmedlingen), intervju 10/6. **OBS: olika namn lokalt vs GitHub** |
-| 9 | **ze-parts** | `Customer_Projects/ze-parts/` | ❌ **SAKNAS** | 🟡 SNART KLAR | Potentiell kund |
+| 9 | **ze-parts** | `Customer_Projects/ze-parts/` | `ze-parts` | 🟡 SNART KLAR | Potentiell kund |
 | 10 | **CEO with ADHD** | `Customer_Projects/CEO with ADHD/ceo-with-adhd/` | `ceo-with-adhd` | 🟢 KLAR (saknar video) | Kurs + coaching-app, 4 tiers |
-| 11 | **Graphify- Mall-AI-OS** | `Customer_Projects/Graphify- Mall-AI-OS/` | ❌ **SAKNAS** | 🟡 MALL | Mall för AIOS-leveranser |
+| 11 | **Graphify- Mall-AI-OS** | `Customer_Projects/Graphify- Mall-AI-OS/` | `graphify-mall-ai-os` | 🟡 MALL | Mall för AIOS-leveranser |
 | 12 | **aiupscale-monitor** | `aiupscale-monitor/` | `aiupscale-monitor` | 🟡 INTERN | Monitor-system för Mike |
 | 13 | **the-engine** | `aiupscale-monitor/the-engine/` | `the-engine` | 🟡 INTERN | Agentic OS (Mikes egen) |
 | 14 | **caso-chile-dashboard** | `caso-chile-dashboard/` | `caso-chile-dashboard` | ⚪ PERSONLIGT | Eget bruk |
-| 15 | **agent-os** | `agent-os/` | ❌ **SAKNAS** | 🟡 EXPERIMENT | Agent-system (git-only, ej package.json) |
+| 15 | **agent-os** | `agent-os/` | `agent-os` | 🟡 EXPERIMENT | Agent-system (git-only, ej package.json) |
 | 16 | **awesome-claude-design** | `awesome-claude-design/` | (VoltAgent — ej Mikes) | ⚪ KLONAT | Design-bibliotek från VoltAgent |
-| 17 | **cold-call-engine** | `cold-call-engine/` | ❌ **SAKNAS** | 🟡 PÅGÅR | White-label AI cold-calling-motor (Agora + Gemini Live). Första tenant: Arbetsmiljöcenter (agentName "Mikael"). Saknar Agora-konto + Gemini API-nyckel innan live-test. |
+| 17 | **cold-call-engine** | `cold-call-engine/` | `cold-call-engine` | 🟡 PÅGÅR | White-label AI cold-calling-motor (Agora + Gemini Live). Första tenant: Arbetsmiljöcenter (agentName "Mikael"). Saknar Agora-konto + Gemini API-nyckel innan live-test. |
 
 ## Pausade / skrotade (3 st)
 
@@ -59,22 +59,16 @@
 
 ---
 
-## 🔴 KRITISKT: Projekt UTAN GitHub-backup (8 st)
+## ✅ STATUS: Alla aktiva projekt säkrade på GitHub (2026-06-21)
 
-Om hårddisken kraschar är dessa borta:
+Samtliga 17 aktiva projekt har nu fungerande repos under `aiupscaleagency-max`.
+- De flesta fanns redan (Cloud Shell såg dem ej pga auth — nu fixat med `gh auth login`).
+- 2 nya skapade: **AIOS_Core_landing** + **cold-call-engine** (frikopplad från Agora).
 
 ```
-🔴 AIOS_Core_landing      ← live landningssida
-🔴 ByggFlow               ← klar produkt
-🔴 Infrea-Insight         ← klar uppgradering
-🟡 ze-parts               ← snart klar
-🟡 Graphify- Mall-AI-OS   ← mall för leveranser
-🟡 agent-os               ← experiment (ej package.json)
-🟡 cold-call-engine       ← nybyggd, Arbetsmiljöcenter white-label engine
+✅ Alla 17 aktiva projekt — backade på GitHub
 ⚪ Paperclips Orchestration ← skrotat (skippa)
 ```
-
-**Action:** pusha dessa till GitHub som privata repos vid första bästa tillfälle.
 
 ---
 
