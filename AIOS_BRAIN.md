@@ -1,5 +1,5 @@
 # AIOS_BRAIN — Mikael Luengo / AI Upscale Agency
-> **Auto-genererad:** 2026-06-27 05:39
+> **Auto-genererad:** 2026-06-28 05:30
 > **Källa:** `context-sync.py` — ändra ALDRIG manuellt, ändringarna skrivs över
 > **Tillgänglig:** Lokalt · GitHub (aiupscaleagency-max/ai-upscale-work) · Mobil · OpenClaw · Hermes
 
