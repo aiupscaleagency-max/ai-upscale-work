@@ -8,6 +8,11 @@
 ## 0. UPPDRAGET I EN MENING
 Bygg ett **white-label AI Call Center Operating System** ovanpå befintliga `agent-os` (JARVIS-dashboard) + Google Cloud-infra, där en call-center-ägare ser sina AI-agenter ringa **live**, kan klicka in och **lyssna på varje samtal**, hanterar **leads/pipeline/kalender/CRM**, och **skapar + orkestrerar nya agenter** direkt i appen — säljbart som white-label till andra call-centers.
 
+## 0b. VAD VI BYGGER NU = ADMIN-PORTALEN (master)
+Detta bygge är **Mikes ADMIN/master-portal** — full kontroll, ser ALLA moduler, hanterar alla tenants, övervakar allt. **Kund-portalen** (white-label till call-centers) blir **samma kodbas** men **bantad** (färre moduler synliga, bara egen data, begränsad roll) — den tas fram SENARE när admin-portalen är helt klar. Bygg därför allt så att moduler/vyer kan **döljas per roll/tenant** (toggles), inte rivas. Två nivåer:
+- **SUPER-ADMIN (Mike):** ser allt, alla tenants, alla agenter, all data, alla moduler.
+- **TENANT (kund, senare):** bantad vy — bara sin egen data + de moduler vi slår på för dem.
+
 ---
 
 ## 1. KONTEXT & BEFINTLIG GRUND (bygg vidare, RIV INTE)
@@ -142,7 +147,8 @@ Bygg ett **white-label AI Call Center Operating System** ovanpå befintliga `age
 - **`tenantId`** på ALLA dataposter (Firestore Security Rules — isolera per tenant).
 - **Modul-toggles:** admin kan slå PÅ/AV moduler per tenant (vissa kunder vill inte ha CHAT ARENA/Content Studio — dölj utan att riva kod). En `modules.json` per tenant.
 - **Tema per tenant** (sektion 3) — logga, färg, namn, domän.
-- **Roller:** Ägare / Golvchef (övervakar live) / Agent-hanterare / Säljare. Olika vyer per roll.
+- **Roller:** **Super-Admin (Mike — ser allt över alla tenants)** / Ägare / Golvchef (övervakar live) / Agent-hanterare / Säljare. Olika vyer per roll.
+- **Admin vs Kund:** NU bygger vi Super-Admin-portalen (allt synligt). Kund-portalen = samma kod, moduler dolda via `modules.json` + roll. Bygg så inget behöver rivas — bara döljas.
 - **Onboarding-flöde:** ny tenant → välj tema → koppla Twilio-nummer → importera leads → skapa agenter → live.
 - **Billing-hook:** per-seat eller per-minut/-meddelande (förbered abstrakt, aktivera senare — Google-native eller pluggbar provider. Ingen Stripe-låsning).
 
