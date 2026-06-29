@@ -34,6 +34,8 @@ Detta bygge är **Mikes ADMIN/master-portal** — full kontroll, ser ALLA module
 
 **Läs även:** `SYSTEM_STATE.md` (delad arkitektur), `GCP_STATUS.md`, `inventory.json`, `GEMINI-HANDOFF-GOOGLE-CLOUD.md`.
 
+**⚙️ KOD-APPENDIX:** `CALLCENTER-OS-APPENDIX-CODE.md` — fungerande referenskod för telefoni-adapter (Twilio/Vonage/Telnyx) ↔ Gemini Live ↔ Firestore ↔ live-lyssning. Läs den för Fas B/C.
+
 ---
 
 ## 2. TECH STACK (exakt vad som används — avvik inte utan att fråga)
