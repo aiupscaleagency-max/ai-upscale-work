@@ -163,7 +163,7 @@ Collections: `tenants` · `users` (roll, tenantId) · `agents` (persona, llm, vo
 ---
 
 ## 8. BYGG-ORDNING (faser — leverera verifierbart per steg)
-1. **Fas A — Fundament:** multi-tenant + tema-system + Supabase-schema + auth + flytta CRM från localStorage.
+1. **Fas A — Fundament:** multi-tenant + tema-system + Firestore-schema + auth + flytta CRM från localStorage.
 2. **Fas B — Dialer + CRM-koppling:** Twilio-integration via Cloud Run, AI-samtal (Gemini Live), samtal loggas i CRM.
 3. **Fas C — Live-övervakning:** live-vägg, klicka-in, lyssna, transkript, statistik (WOW-funktionen).
 4. **Fas D — Pipeline + Kalender:** kanban + Google Calendar-synk + auto-uppföljning.
