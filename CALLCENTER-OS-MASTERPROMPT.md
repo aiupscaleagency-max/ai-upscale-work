@@ -22,8 +22,8 @@ Bygg ett **white-label AI Call Center Operating System** ovanpå befintliga `age
 | AURA (Agent Hub) — generativ AI, röst in/ut, moln+lokal | ✅ |
 | `aura-proxy.js` — håller nycklar hemliga (lokal + Cloud Run) | ✅ |
 | Content Studio (Flow/Veo + Omni-video) | ✅ |
-| Skills Studio (112 skills, 40 agenter, 44 kommandon från `inventory.json`) | ✅ |
-| CRM (leads/pipeline/stats, localStorage) | ✅ MVP — ska uppgraderas till Supabase + dialer |
+| Skills Studio (agent-/skill-katalog från `inventory.json`) | ✅ — gör företags-agnostisk (ta bort personliga/Mike-specifika skills för kund-bygget) |
+| CRM (leads/pipeline/stats, localStorage) | ✅ MVP — ska uppgraderas till Firestore + dialer |
 | Agent Studio (skapa agent, /issue) | ✅ MVP — ska bli full Orchestration Builder |
 | Visualisering (Knowledge Graph, Memory Galaxy) | ✅ |
 
@@ -38,13 +38,17 @@ Bygg ett **white-label AI Call Center Operating System** ovanpå befintliga `age
 | Frontend | Vanilla HTML/CSS/JS (`agent-os`), hostas på **Firebase Hosting** |
 | Backend / agenter | **Cloud Run** (Docker), **ADK** (Agent Development Kit, agent-starter-pack) |
 | Realtids röst/video | **Vertex AI — Gemini Live API** (Cyber Guardian = orkestrator) |
-| Telefoni / dialer | **Twilio** (Voice, nummer, SIP) + Gemini Live för AI-samtal |
-| Databas | **Supabase** (EU North, primär) — agent-os CRM migreras hit från localStorage |
+| Telefoni / dialer | **Pluggbar telefoni: Twilio / Vonage / Telnyx** (en `telephony`-adapter, välj provider per tenant så marginal på samtal/SMS kan tas ut) + Google telephony-tjänster där det passar. Gemini Live driver AI-samtalen. **INTE Agora, INTE Retell.** |
+| Databas | **Firestore** (Google-native, region `europe-north1`) — agent-os CRM migreras hit från localStorage. (Ingen Supabase i denna white-label-produkt.) |
 | Hemligheter | **Secret Manager** (ALLA nycklar — aldrig i frontend/git) |
 | Schemaläggning | **Cloud Scheduler** + **Cloud Tasks** (async jobb) |
 | Bild/video | **Imagen** + **Gemini Omni** |
+| Kontor / kalender / mail | **Google Workspace** (Calendar, Gmail, Drive) |
 | Auth | **Firebase Auth** (multi-tenant inloggning) |
+| Kunskapsgraf | **Graphify** + **Obsidian** + **Cloud Console Graph View** (se sektion 11) |
 | Projekt-ID | `cyber-guardian-32596` · region **`europe-north1`** |
+
+**Telefoni-princip:** bygg en **abstrakt `telephony`-adapter** (samma interna API) med implementationer för Twilio, Vonage och Telnyx. Tenant väljer provider i sina inställningar. Inga provider-specifika antaganden i UI:t. Detta gör att du kan lägga på marginal per samtal/SMS senare.
 
 **Säkerhetsregel (absolut):** API-nycklar bor ENDAST i Secret Manager (moln) eller `.zshenv`/`.env.local` (lokalt). ALDRIG i en fil som checkas in eller i frontend-JS. Frontend pratar alltid med Cloud Run-proxy, aldrig direkt med Google/Twilio-API:er.
 
@@ -96,7 +100,7 @@ Bygg ett **white-label AI Call Center Operating System** ovanpå befintliga `age
 - Teknik: WebSocket från Cloud Run → frontend för live-status; Twilio Media Streams för audio.
 
 ### 4.3 💼 CRM (uppgradera befintlig)
-- Migrera från localStorage → **Supabase** (synk mobil/web/flera enheter).
+- Migrera från localStorage → **Firestore** (synk mobil/web/flera enheter, realtid).
 - Kontakt-poster: namn, företag, telefon, email, status, taggar, samtalshistorik, inspelningar, anteckningar, nästa steg.
 - Koppling dialer ↔ CRM: varje samtal loggas automatiskt på kontakten.
 - Import/export (CSV, API). Sök, filter, segment.
@@ -135,22 +139,22 @@ Bygg ett **white-label AI Call Center Operating System** ovanpå befintliga `age
 ## 5. WHITE-LABEL / MULTI-TENANT (säljbart)
 
 - **Multi-tenant från grunden:** varje call-center = en tenant (eget tema, egen data, egna agenter, egna nummer).
-- **`tenantId`** på ALLA dataposter (Supabase row-level security per tenant).
+- **`tenantId`** på ALLA dataposter (Firestore Security Rules — isolera per tenant).
 - **Modul-toggles:** admin kan slå PÅ/AV moduler per tenant (vissa kunder vill inte ha CHAT ARENA/Content Studio — dölj utan att riva kod). En `modules.json` per tenant.
 - **Tema per tenant** (sektion 3) — logga, färg, namn, domän.
 - **Roller:** Ägare / Golvchef (övervakar live) / Agent-hanterare / Säljare. Olika vyer per roll.
 - **Onboarding-flöde:** ny tenant → välj tema → koppla Twilio-nummer → importera leads → skapa agenter → live.
-- **Billing-hook:** per-seat eller per-minut (förbered, men aktivera senare).
+- **Billing-hook:** per-seat eller per-minut/-meddelande (förbered abstrakt, aktivera senare — Google-native eller pluggbar provider. Ingen Stripe-låsning).
 
 ---
 
-## 6. DATAMODELL (Supabase — minimum)
-`tenants` · `users` (roll, tenantId) · `agents` (persona, llm, voice, kampanj) · `contacts` (lead-data) · `calls` (agent, kontakt, längd, inspelning-URL, transkript, resultat, sentiment) · `pipeline_deals` (steg, värde, kontakt) · `campaigns` (ringlista, schema, agent) · `calendar_events` · `activities` (timeline). Allt med `tenant_id` + RLS.
+## 6. DATAMODELL (Firestore — minimum)
+Collections: `tenants` · `users` (roll, tenantId) · `agents` (persona, llm, voice, kampanj) · `contacts` (lead-data) · `calls` (agent, kontakt, längd, inspelning-URL, transkript, resultat, sentiment, telephony-provider) · `pipeline_deals` (steg, värde, kontakt) · `campaigns` (ringlista, schema, agent) · `calendar_events` · `activities` (timeline). Allt med `tenantId` + Firestore Security Rules som isolerar per tenant.
 
 ---
 
 ## 7. ICKE-FUNKTIONELLA KRAV
-- **Säkerhet:** Secret Manager för nycklar, RLS per tenant, inspelnings-samtycke, GDPR (EU-data), audit-logg.
+- **Säkerhet:** Secret Manager för nycklar, Firestore Security Rules per tenant, inspelnings-samtycke, GDPR (all data i `europe-north1`), audit-logg.
 - **Prestanda:** lazy-load moduler, WebSocket bara för live-vyn, paginering, Cloud Run scale-to-zero, max-instances-tak (kostnad).
 - **Skalbarhet:** byggt för 100+ tenants × många agenter. Inget hårdkodat singel-tenant-antagande.
 - **Observability:** Cloud Logging, fel-rapportering, kostnadstak per tenant.
@@ -180,10 +184,29 @@ Verifiera varje fas (kör, testa i browser, visa bevis) INNAN nästa. Commit + p
 ---
 
 ## 10. ROLLER: vem gör vad
-- **Gemini Enterprise / Code Assist (Cloud Shell):** GCP-infra — Cloud Run-deploys, Secret Manager, Twilio-koppling, Vertex AI/Gemini Live, Supabase, Cloud Scheduler. Äger backend + moln.
+- **Gemini Enterprise / Code Assist (Cloud Shell):** GCP-infra — Cloud Run-deploys, Secret Manager, telefoni-adapter (Twilio/Vonage/Telnyx), Vertex AI/Gemini Live, **Firestore**, Cloud Scheduler, Google Workspace. Äger backend + moln.
 - **Claude Code (lokalt):** frontend `agent-os` (alla moduler/UI/design/tema), agent-os ↔ Cloud Run-koppling, white-label-system. Äger frontend + UX.
 - **Regel mellan er:** `git pull` FÖRST före varje redigering. Dela katalog-filer (`SYSTEM_STATE.md`, `inventory.json`) ägs av frontend-sidan. Skriv aldrig över varandras filer — pulla, redigera, pusha.
 
 ---
 
-*Skriven av Claude för Mike Luengo · AI Upscale Agency · 2026-06-21. Mål: white-label AI Call Center OS säljbart till call-centers. Bygg vidare på befintliga agent-os, riv inget, fråga vid oklarhet.*
+## 11. KUNSKAPSSTRUKTUR — Graphify + Obsidian + Graph View (gäller HELA bygget)
+
+Allt vi bygger ska struktureras så att både människor och agenter snabbt förstår systemet och sparar tokens.
+
+**Regler för varje ny modul/fil:**
+1. **Graphify:** kör/uppdatera knowledge graph (`graphify-out/`) efter varje större modul → noder + relationer för kod & moduler. Agenter navigerar grafen istället för att läsa hela filer.
+2. **Obsidian:** varje modul får en not i vaulten (`Obsidian-Vaults/AI-Upscale-Brain/`) med `summary:` i frontmatter + `[[länkar]]` till relaterade moduler. Kör `scripts/add-summaries.js` så allt har summary (70–90 % token-besparing).
+3. **`summary:`-fält obligatoriskt** på alla noter/registry-poster → agenter läser en rad, inte hela filen.
+
+**Toggle Graph View (i appen + Cloud Console):**
+- Lägg en **"Graph View"-toggle** i OS:et (knapp) som visar systemet som interaktiv graf — moduler, agenter, tenants, dataflöden — likt **Google Cloud Console Graph View**.
+- Samma data ska kunna visas på **alla plattformar:** i appen (3D/2D-graf), i Obsidian (native graph), i Cloud Console (resurs-graf), i Graphify (`graph.html`).
+- Toggle = användaren slår på/av graf-vyn över valfri vy (live-väggen, pipeline, agent-flöden) för maximal överblick.
+- Återanvänd befintlig graf-grund (`brain-graph.html`, `graphify-out/graph.html`, planerad AIOS Constellation).
+
+**Mål:** en konsekvent kunskapsgraf som speglas i app + Obsidian + Cloud Console + Graphify — så att vilken agent eller människa som helst ser hela systemet på sekunder.
+
+---
+
+*Skriven av Claude för Mike Luengo · AI Upscale Agency · 2026-06-30. Mål: white-label AI Call Center OS säljbart till call-centers. Telefoni: Twilio/Vonage/Telnyx (pluggbar) + Gemini + Google Workspace + Google Cloud. Databas: Firestore. INTE Agora/Retell/Supabase/Stripe/Hostinger. Bygg vidare på befintliga agent-os, riv inget, fråga vid oklarhet.*
