@@ -1,5 +1,5 @@
 # AIOS_BRAIN — Mikael Luengo / AI Upscale Agency
-> **Auto-genererad:** 2026-06-29 05:39
+> **Auto-genererad:** 2026-06-30 05:30
 > **Källa:** `context-sync.py` — ändra ALDRIG manuellt, ändringarna skrivs över
 > **Tillgänglig:** Lokalt · GitHub (aiupscaleagency-max/ai-upscale-work) · Mobil · OpenClaw · Hermes
 
@@ -577,6 +577,70 @@ Bygga Cold Calling Agents för kunden. Mike avser använda OpenClaw eller Hermes
 **Blockerare kvar:** (1) ElevenLabs API-nyckel + klonad Voice ID för `arbetsmiljocenter-human`-tenanten (inte akut — gemini-live fungerar). (2) cold-call-engine saknar egen GitHub-remote (origin = Agoras upstream — ALDRIG pusha dit). (3) Agora Conversational AI Engine-tillägg måste vara aktiverat i Agora Console.
 
 **Status 2026-06-16:** Spår 2 LIVE — agenten startar, API fungerar. Nästa steg: öppna `http://localhost:3000?tenant=arbetsmiljocenter` i Chrome, klicka "Start conversation", tillåt mikrofon. Relaterat: [[infra_openclaw]], [[credentials_supabase]], [[projects_registry]].
+
+### [project_caller_aios]
+Caller AIOS är ett white-label AI-callcenter-OS (CRM + pipeline + AI-agenter + transkript + chat + knowledge) byggt som Next.js 15 app med Firebase.
+
+**Plats:** `~/ai_upscale_work/caller-aios/`
+**Live (Vercel fallback):** https://caller-aios.vercel.app
+**Demo:** `?org=demo` (Arbetsmiljöcenter, default cyan) | `?org=demo2` (ByggFlow OS, orange/lime, Knowledge dold)
+
+## Arkitekturbeslut (låsta 2026-06-30)
+1. **Next.js 15** (inte vanilla HTML) → deployas till **Firebase Hosting** (webframeworks, europe-west1)
+2. **GCP-projekt: `abstract-tract-480217-q6`** (biz-aiupscale-API, proj 500433049664)
+3. **Fristående från agent-os** — delar designspråk, portar inte kod
+4. **Firebase** (Firestore + Auth + Storage) — INTE Supabase (Mike sa nej explicit)
+5. **Twilio + Gemini Live** för voice (bridge.ts i `/voice-engine/providers/twilio-gemini/`)
+
+## Klart per 2026-06-30
+
+### Fas A (White-label + multi-tenant)
+- OrgTheme (primaryColor/liveColor/backgroundColor/brandName/logoUrl) per org
+- enabledModules per org styr nav-items (ModuleId: dashboard/leads/pipeline/calls/chat/agents/knowledge/settings)
+- superAdmins/{uid} collection + isSuperAdmin() i Firestore-regler
+- pipeline_deals collection (valueKr/stage/leadId)
+- Firestore-index-fil (firestore.indexes.json)
+- Firebase Hosting-config (firebase.json + .firebaserc)
+
+### Fas B (GDPR + samtal)
+- DNC-koll (lead.dncOptOut) + tidsfönsterkoll (07-20 Europe/Stockholm) i outbound-API
+- /calls/[id] — live-transkript via onSnapshot på call_transcript_chunks
+- Outcome-taggning per samtal (manuell, synkar lead-status vid BOKAD)
+- Leads: manuell inläggning, DNC-toggle, Ring nu per rad, statusfärger
+
+### Fas D (Pipeline)
+- HTML5 native drag-and-drop Kanban (ingen extra lib)
+- Total pipeline-värde per kolumn + grand total
+- Senaste samtal-outcome per kort, länk till call-detaljsida
+
+### Fas E/F (Super-admin + Settings + Historik)
+- /admin: cross-org statistik, skapa org med color picker (super-admin only)
+- /settings: white-label tema-editor, GDPR ring-tidsfönster, org-info
+- /calls: komplett samtalshistorik, konverteringsstatistik, klick→detaljsida
+- Agent-form v2: 6 Gemini-röster, 10 språk, AI-avslöjning-toggle, delete, expanderbara kort
+
+## Återstår (kräver Mike's åtgärder)
+1. `gcloud auth login` (interaktivt, ~2 min) + config set project abstract-tract-480217-q6
+2. Riktig Twilio-nyckel + nummer → `.env.local` (TWILIO_ACCOUNT_SID/AUTH_TOKEN)
+3. Riktig GEMINI_API_KEY → `.env.local`
+4. ANTHROPIC_API_KEY → `.env.local` (chat-arena funkar utan, ger fallback-meddelande)
+5. Firebase Hosting migrate: `npx firebase-tools experiments:enable webframeworks` + `init hosting`
+
+## Återstår (komplex, Fas C.2-C.3)
+- Listen-in (ljud-spegling WebSocket)
+- Whisper/barge-in (ai-coach under samtal)
+- Calendar (Google Calendar API)
+- Billing webhook (Stripe)
+
+## Tekniskt viktigt att komma ihåg
+- recharts: ALDRIG var(--primary) som fill — använd CHART_COLORS-konstant med hex-literal
+- RSC→Client: Firestore Timestamp kan inte passera som prop — JSON.parse(JSON.stringify()) i layout
+- Firebase Admin: lazy singleton-mönster (cachedApp/cachedAuth/cachedDb) — undviker build-krasch
+- pnpm override: jose@^4.15.9 (v4 = CJS, v6 = ESM-only, kraschar på Vercel)
+- serverExternalPackages: ["firebase-admin"] i next.config.ts
+
+**Why:** Caller AIOS är Mikes white-label AI call-center-produkt, säljs till B2B (t.ex. Arbetsmiljöcenter är bekräftad deal).
+**How to apply:** Se CALLCENTER-OS-MASTERPROMPT.md + caller-aios/CLAUDE.md + caller-aios/DESIGN.md.
 
 ### [project_ceo_adhd]
 # CEO with ADHD — Projektminne
