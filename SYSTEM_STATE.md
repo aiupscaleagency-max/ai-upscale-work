@@ -34,6 +34,17 @@ Säker CLI-exekvering från agent-os — svar på "kan agenten köra gcloud/CLI-
 - Frontend ringer: lokal proxy `/aura {prompt}→text`, eller moln `/chat {message}→reply` (via `aura-config.js`).
 - Förmågor: skriva ✅, prata ✅, videosamtal 🟣 (Fas 3, kräver Gemini Live + avatar).
 
+## GCP-projekt-karta (flera projekt, avsiktligt)
+| Projekt-ID | Namn | Konto | Syfte |
+|---|---|---|---|
+| **`caller-aios`** | Caller-AIOS | `Mikael@aiupscale.agency` | **Call-Center OS** (CALLCENTER-OS-MASTERPROMPT.md, Fas A-F) |
+| `cyber-guardian-32596` | Cyber Guardian | `aiupscaleagency@gmail.com` | AURA/agent-os-experiment (Cloud Run, Firebase) — kräver `gcloud auth login --account=aiupscaleagency@gmail.com` för att synas lokalt på Macen |
+| `abstract-tract-480217-q6` | biz-aiupscale-API | `Mikael@aiupscale.agency` | AURA ADK live-agent (adk_live, agent-starter-pack) |
+| `gen-lang-client-0597537679` | ThyroidAI Clinic - New Design | — | ThyroidAI |
+| `extreme-surge-487813-v9` | n8n-integration | — | Automation |
+
+**Byt aktivt projekt/konto innan CLI-kommandon:** `gcloud config set account <konto>` + `gcloud config set project <id>`. Terminal Bridge kör alltid mot vad `gcloud` för tillfället pekar på — kolla FÖRST med `gcloud config list`.
+
 ## Moln-infrastruktur (Google Cloud, projekt `cyber-guardian-32596`)
 | Resurs | Status |
 |---|---|
