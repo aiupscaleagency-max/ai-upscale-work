@@ -17,8 +17,16 @@
 | Content Studio | **Flow** (Veo-video) + **Omni** (Gemini Omni-video) |
 | Skills Studio | 112 skills + 40 agenter (inkl RUFLO) + 44 kommandon (från `inventory.json`) |
 | CRM | Leads, pipeline, stats |
-| Agent Studio | Skapa agenter, `/issue` |
+| Agent Studio | Skapa agenter, `/issue`, **🖥️ Terminal Bridge** (kör gcloud/git/gh/npm säkert) |
 | Visualisering | Knowledge Graph, Master Brain, Memory Galaxy |
+
+## Terminal Bridge (`cli-bridge.js`, port 8790)
+Säker CLI-exekvering från agent-os — svar på "kan agenten köra gcloud/CLI-kommandon åt mig". Ersätter behovet av ett separat Python-orkestrator-system (STT/TTS + brain + CLI-wrapper) — allt byggs in i befintlig AURA/agent-os istället.
+- Allowlist: `gcloud`, `git`, `gh`, `npm`, `ls`. Allt annat avvisas.
+- Ingen shell-tolkning (execFile med argv-array) — shell-metatecken (`;&|` osv) blockeras = ingen injection.
+- Riskfyllda kommandon (delete/remove/destroy/rm/disable/purge/revoke) kräver explicit bekräftelse i UI:t innan körning.
+- Loggar allt lokalt (`cli-bridge.log`, gitignored).
+- UI: Agent Studio → Terminal Bridge-panel (snabbknappar + fritt fält + confirm-modal).
 
 ## AURA (kärn-AI)
 - Persona: "kvinnan" — andra hjärna + HQ. Talar svenska, ADHD-anpassat.
