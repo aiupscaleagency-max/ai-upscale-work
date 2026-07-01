@@ -1,5 +1,5 @@
 # AIOS_BRAIN — Mikael Luengo / AI Upscale Agency
-> **Auto-genererad:** 2026-06-30 05:30
+> **Auto-genererad:** 2026-07-01 05:30
 > **Källa:** `context-sync.py` — ändra ALDRIG manuellt, ändringarna skrivs över
 > **Tillgänglig:** Lokalt · GitHub (aiupscaleagency-max/ai-upscale-work) · Mobil · OpenClaw · Hermes
 
@@ -203,6 +203,34 @@ done
 
 ## MINNEN & KONTEXT (Memory)
 ────────────────────────────────────────────────────────────
+
+### [credentials_caller_aios]
+Alla credentials för Caller AIOS (`~/ai_upscale_work/caller-aios/.env.local`).
+
+## GCP-projekt
+- Project ID: `abstract-tract-480217-q6` (biz-aiupscale-API)
+- Project number: `500433049664`
+
+## Firebase / Identity Platform
+- API Key: `AIzaSyABfGIMGaE1lvvS2DaGQ3pJOjfst4CMxZU`
+- Auth Domain: `abstract-tract-480217-q6.firebaseapp.com`
+- Service Account: `firebase-adminsdk-fbsvc@abstract-tract-480217-q6.iam.gserviceaccount.com`
+- Service Account JSON: nedladdat `abstract-tract-480217-q6-a5c816afafe5.json`
+
+## AI API:er
+- GEMINI_API_KEY: Callcenter-API (AQ.Ab8RN6... format, AI Studio)
+- ANTHROPIC_API_KEY: sk-ant-api03-PCfYFmSM... (console.anthropic.com)
+
+## Twilio
+- Ej konfigurerat än — lämnat tomt i .env.local
+
+## Firestore-databas
+- Databas: `(default)` i `abstract-tract-480217-q6`
+- Mode: Native (skapad 2026-06-30)
+- Region: europe-west1
+
+**Why:** Mike har flera projekt med API-nycklar — hämta alltid härifrån istället för att fråga.
+**How to apply:** Läs denna fil INNAN du ber Mike om credentials för Caller AIOS.
 
 ### [feedback_agent_validation_before_build]
 # Regel: Validera innan bygge
@@ -1255,6 +1283,13 @@ Komplett inventering och registry skapad: `~/ai_upscale_work/AGENTS_REGISTRY.md`
 - När vi pratar om OpenClaw-agenter, content factory-agenter, eller stor-skala automation → föreslå gratis Claude / billig modell
 - GenSpark + temp-mail-tricket är PARKERAT till OpenClaw-skalning, inte för Mike's dagliga arbete
 - Fråga alltid innan LLM-byte och visa exakta priser (befintlig regel)
+
+### [strategy_supabase_migration]
+Mike byter bort från Supabase för ALLA projekt (bekräftat 2026-06-30).
+
+**Why:** Beslut taget av Mike. Supabase-projektet för ThyroidAI var pausat/inaktivt vid typecheck-fix, vilket förstärkte beslutet.
+
+**How to apply:** Föreslå aldrig Supabase för nya projekt. Fråga Mike vilket databas-alternativ han föredrar (troligtvis Firebase, Postgres på VPS, eller annat) om ett nytt projekt behöver en databas. För befintliga projekt med Supabase-kod — anpassa men renovera inte aktivt om inte Mike ber om det.
 
 ## AGENTER & SKILLS (AGENTS_REGISTRY)
 ────────────────────────────────────────────────────────────
